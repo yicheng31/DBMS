@@ -1,0 +1,61 @@
+# Environment variables — never commit API keys
+.env
+
+# Instructor reference copies — not distributed to students
+*_og.py
+*_og.sql
+*_og.cypher
+
+# Claude Code session files
+.claude/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Distribution / packaging
+dist/
+build/
+
+# Testing and type checking
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Logs
+*.log
+
+# Database exports and dumps — never commit data exports
+*.dump
+*.sql.dump
+*.sql.bak
+*.csv
+
+# Gradio — created automatically when the chat UI runs
+flagged/
+.gradio/
+gradio_cached_examples/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini

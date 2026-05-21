@@ -1,0 +1,137 @@
+{
+  "version": "1.0",
+  "last_updated": "2024-01-01",
+  "metro": {
+    "bicycles": {
+      "foldable_bicycles": {
+        "permitted": true,
+        "max_folded_dimensions_cm": "90 × 45 × 30",
+        "peak_hour_restriction": true,
+        "peak_hours": "07:00–09:30 and 17:00–20:00, Monday to Friday",
+        "peak_hour_rule": "Foldable bicycles are NOT permitted during peak hours even if folded.",
+        "fee": 0.00,
+        "placement": "Passenger is responsible for keeping the bicycle with them and must not block aisles or doors."
+      },
+      "standard_bicycles": {
+        "permitted": false,
+        "reason": "Standard (non-foldable) bicycles are not permitted on the metro at any time."
+      },
+      "electric_scooters": {
+        "permitted": false,
+        "reason": "E-scooters and hoverboards are prohibited on all metro services due to fire safety regulations, even if folded or switched off."
+      }
+    },
+    "luggage": {
+      "items_per_passenger": 2,
+      "max_dimensions_per_item_cm": "70 × 50 × 30",
+      "oversized_peak_restriction": true,
+      "oversized_peak_rule": "Items exceeding the size limit are not permitted during peak hours (07:00–09:30 and 17:00–20:00 weekdays).",
+      "placement": "All luggage must be held by the passenger or placed in the luggage area at the ends of the carriage. Luggage must not block seats, aisles, or doors."
+    },
+    "pets": {
+      "permitted": true,
+      "conditions": "Small pets in fully enclosed hard or soft carriers only.",
+      "max_carrier_dimensions_cm": "50 × 35 × 25",
+      "fee": 0.00,
+      "seat_occupancy": "Pets must not occupy a seat.",
+      "exceptions": "Guide dogs and registered assistance animals are permitted at all times without a carrier.",
+      "prohibited": "Dogs not in carriers are not permitted on the metro, including on leads."
+    },
+    "food_and_drink": {
+      "sealed_drinks": "permitted",
+      "hot_food": "not permitted",
+      "strong_smelling_food": "not permitted",
+      "eating": "Eating is discouraged on the metro. Passengers must not leave litter.",
+      "alcohol": "Alcohol consumption is not permitted on metro services or at stations."
+    },
+    "priority_seating": {
+      "description": "Seats marked with a yellow priority sign are reserved for elderly passengers (65+), pregnant women, passengers with disabilities, and passengers travelling with young children.",
+      "rule": "All other passengers must vacate priority seats immediately when requested."
+    },
+    "prohibited_items": [
+      "Flammable or explosive materials",
+      "Weapons of any kind",
+      "Standard (non-foldable) bicycles",
+      "E-scooters and hoverboards",
+      "Items emitting strong odours that may cause discomfort to other passengers"
+    ],
+    "smoking_and_vaping": "Strictly prohibited on all metro carriages, platforms, and station concourses.",
+    "noise": "Passengers are asked to keep noise to a considerate level. Use of personal audio devices with external speakers is not permitted."
+  },
+  "national_rail": {
+    "bicycles": {
+      "foldable_bicycles": {
+        "permitted": true,
+        "peak_hour_restriction": false,
+        "fee": 0.00,
+        "placement": "Must be stored in the overhead rack or in the space at the end of the carriage.",
+        "max_folded_dimensions_cm": "90 × 45 × 30"
+      },
+      "standard_bicycles": {
+        "permitted": true,
+        "conditions": "Standard bicycles are permitted in designated bicycle bays only. Maximum 2 bicycles per train.",
+        "peak_hour_restriction": true,
+        "peak_hours": "07:00–09:30 and 16:30–19:00, Monday to Friday",
+        "peak_hour_rule": "Standard bicycles are NOT permitted on national rail services during peak hours.",
+        "fee_usd": 2.00,
+        "booking": "Bicycle spaces are first-come-first-served and cannot be reserved in advance. Fee is payable at the platform bicycle bay gate.",
+        "placement": "Bicycles must be placed in the designated bicycle bay. Passengers remain responsible for their bicycle."
+      },
+      "electric_scooters": {
+        "permitted": false,
+        "reason": "E-scooters and hoverboards are not permitted on national rail services."
+      }
+    },
+    "luggage": {
+      "items_per_passenger": 3,
+      "overhead_rack": "Items must fit in the overhead luggage rack above seats. No formal size restriction, but items must not cause inconvenience to other passengers.",
+      "large_items": "Oversized items (e.g. large suitcases) should be placed in the dedicated luggage areas at the ends of each carriage.",
+      "storage_fee": 0.00,
+      "notes": "Passengers are responsible for their own luggage at all times. The operator is not liable for lost or damaged luggage."
+    },
+    "pets": {
+      "guide_and_assistance_dogs": "Permitted at all times in all coaches at no charge.",
+      "other_dogs": {
+        "permitted": true,
+        "conditions": "Dogs must be on a lead at all times. Permitted in standard class coaches only.",
+        "fee": 0.00,
+        "seat_occupancy": "Dogs must not occupy seats."
+      },
+      "small_animals_in_carriers": {
+        "permitted": true,
+        "conditions": "Small animals in enclosed carriers permitted in standard class. Not permitted in first class coaches.",
+        "fee": 0.00
+      },
+      "large_animals": "Not permitted (except registered assistance animals)."
+    },
+    "food_and_drink": {
+      "general": "Food and drink are permitted in all coaches.",
+      "trolley_service": "A refreshment trolley operates on selected services. Check the service schedule for availability.",
+      "alcohol": "Alcohol is permitted in moderation. Passengers behaving disruptively due to alcohol may be asked to leave the train.",
+      "first_class": "Complimentary beverages are not provided. Passengers may bring their own food and drink."
+    },
+    "quiet_zones": {
+      "available": true,
+      "description": "Selected standard class carriages are designated quiet zones. Phone calls, loud music, and disruptive noise are not permitted in quiet zones.",
+      "identification": "Quiet zone carriages are marked with a quiet zone symbol on the door and inside the carriage.",
+      "rule": "Passengers should check carriage markings before boarding if a quiet journey is preferred."
+    },
+    "priority_seating": {
+      "description": "Dedicated priority seats are available in all coaches, marked with a blue priority sign.",
+      "rule": "Priority seats are reserved for elderly passengers (65+), pregnant women, passengers with disabilities, and passengers travelling with young children. Other passengers must vacate on request."
+    },
+    "accessibility": {
+      "wheelchair_access": "All national rail stations are wheelchair accessible. Ramps are available on request from platform staff.",
+      "assisted_boarding": "Passengers requiring assistance should contact customer service at least 24 hours before travel.",
+      "priority_boarding": "Passengers with mobility difficulties are welcome to board first. Please inform platform staff."
+    },
+    "prohibited_items": [
+      "Flammable or explosive materials",
+      "Weapons of any kind",
+      "E-scooters and hoverboards",
+      "Items emitting strong odours that may cause discomfort to other passengers"
+    ],
+    "smoking_and_vaping": "Strictly prohibited on all train carriages and at all station platforms.",
+    "conduct": "Passengers behaving in a manner that causes distress or danger to other passengers or staff may be removed from the train. In serious cases, the operator reserves the right to involve law enforcement."
+  }
+}

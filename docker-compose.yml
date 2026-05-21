@@ -1,0 +1,53 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: transitflow_postgres_v2a
+    environment:
+      POSTGRES_USER: transitflow
+      POSTGRES_PASSWORD: transitflow
+      POSTGRES_DB: transitflow
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data_v2a:/var/lib/postgresql/data
+      - ./databases/relational/schema.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U transitflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  neo4j:
+    image: neo4j:5-community
+    container_name: transitflow_neo4j_v2a
+    environment:
+      NEO4J_AUTH: neo4j/transitflow
+      NEO4J_PLUGINS: '["apoc"]'
+      NEO4J_dbms_security_procedures_unrestricted: apoc.*
+    ports:
+      - "7475:7474"   # Neo4j Browser UI
+      - "7688:7687"   # Bolt protocol
+    volumes:
+      - neo4j_data_v2a:/data
+    healthcheck:
+      test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "transitflow", "RETURN 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 15
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: transitflow_pgadmin_v2a
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5051:80"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data_v2a:
+  neo4j_data_v2a:

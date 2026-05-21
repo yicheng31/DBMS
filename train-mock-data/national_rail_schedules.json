@@ -1,0 +1,194 @@
+[
+  {
+    "schedule_id": "NR_SCH01",
+    "line": "NR1",
+    "service_type": "normal",
+    "direction": "northbound",
+    "origin_station_id": "NR01",
+    "destination_station_id": "NR05",
+    "stops_in_order": ["NR01", "NR02", "NR03", "NR04", "NR05"],
+    "first_train_time": "06:00",
+    "last_train_time": "22:30",
+    "travel_time_from_origin_min": {
+      "NR01": 0,
+      "NR02": 12,
+      "NR03": 30,
+      "NR04": 45,
+      "NR05": 65
+    },
+    "fare_classes": {
+      "standard": { "base_fare_usd": 2.50, "per_stop_rate_usd": 1.50 },
+      "first":    { "base_fare_usd": 4.00, "per_stop_rate_usd": 2.50 }
+    },
+    "frequency_min": 30,
+    "operates_on": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
+  },
+  {
+    "schedule_id": "NR_SCH02",
+    "line": "NR1",
+    "service_type": "normal",
+    "direction": "southbound",
+    "origin_station_id": "NR05",
+    "destination_station_id": "NR01",
+    "stops_in_order": ["NR05", "NR04", "NR03", "NR02", "NR01"],
+    "first_train_time": "06:30",
+    "last_train_time": "23:00",
+    "travel_time_from_origin_min": {
+      "NR05": 0,
+      "NR04": 20,
+      "NR03": 35,
+      "NR02": 53,
+      "NR01": 65
+    },
+    "fare_classes": {
+      "standard": { "base_fare_usd": 2.50, "per_stop_rate_usd": 1.50 },
+      "first":    { "base_fare_usd": 4.00, "per_stop_rate_usd": 2.50 }
+    },
+    "frequency_min": 30,
+    "operates_on": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
+  },
+  {
+    "schedule_id": "NR_SCH03",
+    "line": "NR2",
+    "service_type": "normal",
+    "direction": "eastbound",
+    "origin_station_id": "NR01",
+    "destination_station_id": "NR10",
+    "stops_in_order": ["NR01", "NR06", "NR07", "NR08", "NR09", "NR10"],
+    "first_train_time": "06:15",
+    "last_train_time": "22:00",
+    "travel_time_from_origin_min": {
+      "NR01": 0,
+      "NR06": 14,
+      "NR07": 30,
+      "NR08": 52,
+      "NR09": 74,
+      "NR10": 93
+    },
+    "fare_classes": {
+      "standard": { "base_fare_usd": 2.50, "per_stop_rate_usd": 1.50 },
+      "first":    { "base_fare_usd": 4.00, "per_stop_rate_usd": 2.50 }
+    },
+    "frequency_min": 45,
+    "operates_on": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
+  },
+  {
+    "schedule_id": "NR_SCH04",
+    "line": "NR2",
+    "service_type": "normal",
+    "direction": "westbound",
+    "origin_station_id": "NR10",
+    "destination_station_id": "NR01",
+    "stops_in_order": ["NR10", "NR09", "NR08", "NR07", "NR06", "NR01"],
+    "first_train_time": "07:00",
+    "last_train_time": "22:45",
+    "travel_time_from_origin_min": {
+      "NR10": 0,
+      "NR09": 19,
+      "NR08": 38,
+      "NR07": 60,
+      "NR06": 76,
+      "NR01": 90
+    },
+    "fare_classes": {
+      "standard": { "base_fare_usd": 2.50, "per_stop_rate_usd": 1.50 },
+      "first":    { "base_fare_usd": 4.00, "per_stop_rate_usd": 2.50 }
+    },
+    "frequency_min": 45,
+    "operates_on": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
+  },
+  {
+    "schedule_id": "NR_SCH05",
+    "line": "NR1",
+    "service_type": "express",
+    "direction": "northbound",
+    "origin_station_id": "NR01",
+    "destination_station_id": "NR05",
+    "stops_in_order": ["NR01", "NR03", "NR05"],
+    "passed_through_stations": ["NR02", "NR04"],
+    "first_train_time": "07:00",
+    "last_train_time": "20:00",
+    "travel_time_from_origin_min": {
+      "NR01": 0,
+      "NR03": 25,
+      "NR05": 55
+    },
+    "fare_classes": {
+      "standard": { "base_fare_usd": 6.60, "per_stop_rate_usd": 1.80 },
+      "first":    { "base_fare_usd": 10.80, "per_stop_rate_usd": 3.00 }
+    },
+    "frequency_min": 60,
+    "operates_on": ["mon", "tue", "wed", "thu", "fri"]
+  },
+  {
+    "schedule_id": "NR_SCH06",
+    "line": "NR1",
+    "service_type": "express",
+    "direction": "southbound",
+    "origin_station_id": "NR05",
+    "destination_station_id": "NR01",
+    "stops_in_order": ["NR05", "NR03", "NR01"],
+    "passed_through_stations": ["NR04", "NR02"],
+    "first_train_time": "07:30",
+    "last_train_time": "20:30",
+    "travel_time_from_origin_min": {
+      "NR05": 0,
+      "NR03": 30,
+      "NR01": 55
+    },
+    "fare_classes": {
+      "standard": { "base_fare_usd": 6.60, "per_stop_rate_usd": 1.80 },
+      "first":    { "base_fare_usd": 10.80, "per_stop_rate_usd": 3.00 }
+    },
+    "frequency_min": 60,
+    "operates_on": ["mon", "tue", "wed", "thu", "fri"]
+  },
+  {
+    "schedule_id": "NR_SCH07",
+    "line": "NR2",
+    "service_type": "express",
+    "direction": "eastbound",
+    "origin_station_id": "NR01",
+    "destination_station_id": "NR10",
+    "stops_in_order": ["NR01", "NR07", "NR09", "NR10"],
+    "passed_through_stations": ["NR06", "NR08"],
+    "first_train_time": "07:15",
+    "last_train_time": "19:45",
+    "travel_time_from_origin_min": {
+      "NR01": 0,
+      "NR07": 24,
+      "NR09": 60,
+      "NR10": 78
+    },
+    "fare_classes": {
+      "standard": { "base_fare_usd": 6.60, "per_stop_rate_usd": 1.80 },
+      "first":    { "base_fare_usd": 10.80, "per_stop_rate_usd": 3.00 }
+    },
+    "frequency_min": 90,
+    "operates_on": ["mon", "tue", "wed", "thu", "fri"]
+  },
+  {
+    "schedule_id": "NR_SCH08",
+    "line": "NR2",
+    "service_type": "express",
+    "direction": "westbound",
+    "origin_station_id": "NR10",
+    "destination_station_id": "NR01",
+    "stops_in_order": ["NR10", "NR09", "NR07", "NR01"],
+    "passed_through_stations": ["NR08", "NR06"],
+    "first_train_time": "07:45",
+    "last_train_time": "20:15",
+    "travel_time_from_origin_min": {
+      "NR10": 0,
+      "NR09": 18,
+      "NR07": 54,
+      "NR01": 78
+    },
+    "fare_classes": {
+      "standard": { "base_fare_usd": 6.60, "per_stop_rate_usd": 1.80 },
+      "first":    { "base_fare_usd": 10.80, "per_stop_rate_usd": 3.00 }
+    },
+    "frequency_min": 90,
+    "operates_on": ["mon", "tue", "wed", "thu", "fri"]
+  }
+]

@@ -1,0 +1,130 @@
+[
+  {
+    "station_id": "NR01",
+    "name": "Central Station",
+    "lines": ["NR1", "NR2"],
+    "is_interchange_national_rail": true,
+    "interchange_national_rail_lines": ["NR1", "NR2"],
+    "is_interchange_metro": true,
+    "interchange_metro_station_id": "MS01",
+    "adjacent_stations": [
+      { "station_id": "NR02", "line": "NR1", "travel_time_min": 12 },
+      { "station_id": "NR06", "line": "NR2", "travel_time_min": 14 }
+    ]
+  },
+  {
+    "station_id": "NR02",
+    "name": "Maplewood",
+    "lines": ["NR1"],
+    "is_interchange_national_rail": false,
+    "interchange_national_rail_lines": [],
+    "is_interchange_metro": false,
+    "interchange_metro_station_id": null,
+    "adjacent_stations": [
+      { "station_id": "NR01", "line": "NR1", "travel_time_min": 12 },
+      { "station_id": "NR03", "line": "NR1", "travel_time_min": 18 }
+    ]
+  },
+  {
+    "station_id": "NR03",
+    "name": "Old Town Junction",
+    "lines": ["NR1"],
+    "is_interchange_national_rail": false,
+    "interchange_national_rail_lines": [],
+    "is_interchange_metro": true,
+    "interchange_metro_station_id": "MS07",
+    "adjacent_stations": [
+      { "station_id": "NR02", "line": "NR1", "travel_time_min": 18 },
+      { "station_id": "NR04", "line": "NR1", "travel_time_min": 15 }
+    ]
+  },
+  {
+    "station_id": "NR04",
+    "name": "Ashford",
+    "lines": ["NR1"],
+    "is_interchange_national_rail": false,
+    "interchange_national_rail_lines": [],
+    "is_interchange_metro": false,
+    "interchange_metro_station_id": null,
+    "adjacent_stations": [
+      { "station_id": "NR03", "line": "NR1", "travel_time_min": 15 },
+      { "station_id": "NR05", "line": "NR1", "travel_time_min": 20 }
+    ]
+  },
+  {
+    "station_id": "NR05",
+    "name": "Stonehaven",
+    "lines": ["NR1"],
+    "is_interchange_national_rail": false,
+    "interchange_national_rail_lines": [],
+    "is_interchange_metro": false,
+    "interchange_metro_station_id": null,
+    "adjacent_stations": [
+      { "station_id": "NR04", "line": "NR1", "travel_time_min": 20 }
+    ]
+  },
+  {
+    "station_id": "NR06",
+    "name": "Bridgeport",
+    "lines": ["NR2"],
+    "is_interchange_national_rail": false,
+    "interchange_national_rail_lines": [],
+    "is_interchange_metro": false,
+    "interchange_metro_station_id": null,
+    "adjacent_stations": [
+      { "station_id": "NR01", "line": "NR2", "travel_time_min": 14 },
+      { "station_id": "NR07", "line": "NR2", "travel_time_min": 16 }
+    ]
+  },
+  {
+    "station_id": "NR07",
+    "name": "Ferndale Halt",
+    "lines": ["NR2"],
+    "is_interchange_national_rail": false,
+    "interchange_national_rail_lines": [],
+    "is_interchange_metro": true,
+    "interchange_metro_station_id": "MS15",
+    "adjacent_stations": [
+      { "station_id": "NR06", "line": "NR2", "travel_time_min": 16 },
+      { "station_id": "NR08", "line": "NR2", "travel_time_min": 22 }
+    ]
+  },
+  {
+    "station_id": "NR08",
+    "name": "Coalport",
+    "lines": ["NR2"],
+    "is_interchange_national_rail": false,
+    "interchange_national_rail_lines": [],
+    "is_interchange_metro": false,
+    "interchange_metro_station_id": null,
+    "adjacent_stations": [
+      { "station_id": "NR07", "line": "NR2", "travel_time_min": 22 },
+      { "station_id": "NR09", "line": "NR2", "travel_time_min": 21 }
+    ]
+  },
+  {
+    "station_id": "NR09",
+    "name": "Dunmore",
+    "lines": ["NR2"],
+    "is_interchange_national_rail": false,
+    "interchange_national_rail_lines": [],
+    "is_interchange_metro": false,
+    "interchange_metro_station_id": null,
+    "adjacent_stations": [
+      { "station_id": "NR08", "line": "NR2", "travel_time_min": 21 },
+      { "station_id": "NR10", "line": "NR2", "travel_time_min": 19 }
+    ]
+  },
+  {
+    "station_id": "NR10",
+    "name": "Langford End",
+    "lines": ["NR2"],
+    "is_interchange_national_rail": false,
+    "interchange_national_rail_lines": [],
+    "is_interchange_metro": false,
+    "interchange_metro_station_id": null,
+    "adjacent_stations": [
+      { "station_id": "NR09", "line": "NR2", "travel_time_min": 19 }
+    ]
+  }
+]

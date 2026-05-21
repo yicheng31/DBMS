@@ -1,0 +1,115 @@
+{
+  "version": "1.0",
+  "last_updated": "2024-01-01",
+  "national_rail": {
+    "advance_booking": {
+      "max_days_in_advance": 90,
+      "min_advance": "Tickets may be booked up to 10 minutes before scheduled departure, subject to seat availability.",
+      "recommended": "Booking early is recommended for express services and first class, as capacity is limited."
+    },
+    "seat_selection": {
+      "first_class": {
+        "included": true,
+        "fee_usd": 0.00,
+        "description": "Seat selection is included at no extra charge for all first class bookings."
+      },
+      "standard_class": {
+        "included": false,
+        "fee_usd": 0.50,
+        "description": "Seat selection is optional for standard class. Passengers who do not select a seat will be assigned one at check-in, subject to availability.",
+        "notes": "Window and aisle seats are subject to availability at the time of booking."
+      }
+    },
+    "ticket_changes": {
+      "allowed": true,
+      "change_fee_usd": 1.00,
+      "deadline": "Changes must be requested at least 24 hours before the scheduled departure of the service being changed.",
+      "what_can_be_changed": ["Travel date", "Scheduled service (same route)", "Seat selection"],
+      "what_cannot_be_changed": ["Route (origin/destination)", "Fare class (standard to first or vice versa)", "Ticket type (single to return or vice versa)"],
+      "how_to_change": "Changes can be made via the app, website, or at a staffed ticket counter.",
+      "express_service_note": "Ticket changes are not permitted for express service bookings within 24 hours of departure."
+    },
+    "child_fares": {
+      "under_5": {
+        "fare_usd": 0.00,
+        "condition": "Children under 5 years of age travel free when accompanied by a fare-paying adult. No ticket required."
+      },
+      "age_5_to_15": {
+        "discount_percent": 50,
+        "description": "Children aged 5–15 (inclusive) pay 50% of the applicable adult fare (calculated using the same stops-based formula).",
+        "proof_of_age": "Proof of age may be requested on board. A valid ID, school card, or birth certificate is accepted."
+      },
+      "age_16_and_over": {
+        "description": "Passengers aged 16 and over pay the full adult fare."
+      }
+    },
+    "group_fares": {
+      "minimum_group_size": 10,
+      "discount_percent": 10,
+      "applicable_class": "standard",
+      "conditions": "Group discount applies to standard class single and return tickets only. All group members must travel on the same service. Discount is applied at the time of booking when 10 or more tickets are purchased in a single transaction.",
+      "not_applicable": "Group discount does not apply to first class tickets, express services, or day passes."
+    },
+    "payment": {
+      "accepted_methods": ["credit_card", "debit_card", "ewallet"],
+      "payment_timing": "Full payment is required at the time of booking.",
+      "currency": "USD"
+    },
+    "booking_confirmation": {
+      "method": "Email and in-app notification sent immediately after booking.",
+      "ticket_format": "Digital ticket (QR code) displayed in the app or printable PDF. No physical ticket is required.",
+      "check_in": "Present QR code to platform staff or scanner at the gate before boarding."
+    }
+  },
+  "metro": {
+    "advance_booking": {
+      "single_ticket": "Metro single tickets are purchased on the day of travel only. Advance booking is not available.",
+      "day_pass": "Metro day passes are purchased on the day of travel only. They are valid from 00:00 to 23:59 on the date of purchase.",
+      "where_to_buy": "Tickets can be purchased via the app or at station ticket machines."
+    },
+    "seat_selection": {
+      "available": false,
+      "description": "Metro services have no reserved seating. Passengers board and find available seats freely."
+    },
+    "ticket_changes": {
+      "allowed": false,
+      "description": "Metro tickets cannot be changed. A refund must be requested and a new ticket purchased instead (subject to refund policy RF003 or RF004)."
+    },
+    "child_fares": {
+      "under_5": {
+        "fare_usd": 0.00,
+        "condition": "Children under 5 years of age travel free when accompanied by a fare-paying adult. No ticket required."
+      },
+      "age_5_to_15": {
+        "discount_percent": 50,
+        "description": "Children aged 5–15 (inclusive) pay 50% of the calculated stops-based fare, rounded to the nearest $0.10. Day pass is available at 50% ($2.50) for this age group.",
+        "proof_of_age": "Proof of age may be requested on board."
+      },
+      "age_16_and_over": {
+        "description": "Passengers aged 16 and over pay the full adult fare."
+      }
+    },
+    "group_fares": {
+      "available": false,
+      "description": "Group discounts are not available on metro services."
+    },
+    "payment": {
+      "accepted_methods": ["credit_card", "debit_card", "ewallet"],
+      "payment_timing": "Full payment is required at the time of purchase.",
+      "currency": "USD"
+    },
+    "booking_confirmation": {
+      "method": "In-app confirmation sent immediately after purchase.",
+      "ticket_format": "Digital ticket with QR code displayed in the app.",
+      "check_in": "Tap QR code at the station gate scanner to begin journey."
+    }
+  },
+  "general_rules": {
+    "valid_id": "Passengers may be asked to show a valid photo ID matching the name on the booking. Accepted IDs include national ID card, passport, and driving licence.",
+    "ticket_validity": "A ticket is only valid for the service, date, and passenger named on the booking. Tickets are non-transferable.",
+    "fraud": "Use of another person's ticket, presentation of a counterfeit ticket, or deliberate fare evasion may result in a penalty fare, removal from the service, and/or legal action.",
+    "lost_tickets": "Digital tickets can be retrieved via the app at any time using the booking reference. Passengers are advised to screenshot their QR code before travel in case of connectivity issues.",
+    "customer_service": "Passengers with queries or complaints may contact customer service via the in-app chat, email, or station help desks. Response time is within 2 business days.",
+    "dispute_resolution": "If a passenger disagrees with a refund decision, they may escalate the case to the customer service team within 14 days of the original decision."
+  }
+}

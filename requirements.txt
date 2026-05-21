@@ -1,0 +1,16 @@
+# TransitFlow dependencies
+# Install with: pip install -r requirements.txt
+
+# Database drivers
+psycopg2-binary>=2.9.9       # PostgreSQL + pgvector
+neo4j>=5.18.0                # Neo4j graph database
+
+# LLM providers (install both; only one is used at runtime)
+google-genai>=1.0.0             # Gemini (new SDK, replaces google-generativeai)
+requests>=2.31.0             # Ollama (local)
+
+# Web UI
+gradio>=4.36.0
+
+# Utilities
+python-dotenv>=1.0.0         # Load .env file

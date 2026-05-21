@@ -1,0 +1,180 @@
+[
+  {
+    "schedule_id": "MS_SCH01",
+    "line": "M1",
+    "direction": "northbound",
+    "origin_station_id": "MS20",
+    "destination_station_id": "MS17",
+    "stops_in_order": ["MS20", "MS05", "MS01", "MS02", "MS03", "MS04", "MS17"],
+    "first_train_time": "05:30",
+    "last_train_time": "23:30",
+    "travel_time_from_origin_min": {
+      "MS20": 0,
+      "MS05": 2,
+      "MS01": 5,
+      "MS02": 8,
+      "MS03": 10,
+      "MS04": 14,
+      "MS17": 17
+    },
+    "base_fare_usd": 0.80,
+    "per_stop_rate_usd": 0.30,
+    "frequency_min": 5,
+    "operates_on": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
+  },
+  {
+    "schedule_id": "MS_SCH02",
+    "line": "M1",
+    "direction": "southbound",
+    "origin_station_id": "MS17",
+    "destination_station_id": "MS20",
+    "stops_in_order": ["MS17", "MS04", "MS03", "MS02", "MS01", "MS05", "MS20"],
+    "first_train_time": "05:35",
+    "last_train_time": "23:35",
+    "travel_time_from_origin_min": {
+      "MS17": 0,
+      "MS04": 3,
+      "MS03": 6,
+      "MS02": 8,
+      "MS01": 10,
+      "MS05": 13,
+      "MS20": 15
+    },
+    "base_fare_usd": 0.80,
+    "per_stop_rate_usd": 0.30,
+    "frequency_min": 5,
+    "operates_on": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
+  },
+  {
+    "schedule_id": "MS_SCH03",
+    "line": "M2",
+    "direction": "eastbound",
+    "origin_station_id": "MS06",
+    "destination_station_id": "MS09",
+    "stops_in_order": ["MS06", "MS01", "MS07", "MS18", "MS08", "MS09"],
+    "first_train_time": "05:40",
+    "last_train_time": "23:30",
+    "travel_time_from_origin_min": {
+      "MS06": 0,
+      "MS01": 3,
+      "MS07": 5,
+      "MS18": 7,
+      "MS08": 11,
+      "MS09": 14
+    },
+    "base_fare_usd": 0.80,
+    "per_stop_rate_usd": 0.30,
+    "frequency_min": 6,
+    "operates_on": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
+  },
+  {
+    "schedule_id": "MS_SCH04",
+    "line": "M2",
+    "direction": "westbound",
+    "origin_station_id": "MS09",
+    "destination_station_id": "MS06",
+    "stops_in_order": ["MS09", "MS08", "MS18", "MS07", "MS01", "MS06"],
+    "first_train_time": "05:44",
+    "last_train_time": "23:36",
+    "travel_time_from_origin_min": {
+      "MS09": 0,
+      "MS08": 3,
+      "MS18": 7,
+      "MS07": 9,
+      "MS01": 11,
+      "MS06": 14
+    },
+    "base_fare_usd": 0.80,
+    "per_stop_rate_usd": 0.30,
+    "frequency_min": 6,
+    "operates_on": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
+  },
+  {
+    "schedule_id": "MS_SCH05",
+    "line": "M3",
+    "direction": "northbound",
+    "origin_station_id": "MS13",
+    "destination_station_id": "MS04",
+    "stops_in_order": ["MS13", "MS19", "MS11", "MS10", "MS12", "MS04"],
+    "first_train_time": "05:48",
+    "last_train_time": "23:20",
+    "travel_time_from_origin_min": {
+      "MS13": 0,
+      "MS19": 2,
+      "MS11": 5,
+      "MS10": 7,
+      "MS12": 11,
+      "MS04": 14
+    },
+    "base_fare_usd": 0.80,
+    "per_stop_rate_usd": 0.30,
+    "frequency_min": 8,
+    "operates_on": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
+  },
+  {
+    "schedule_id": "MS_SCH06",
+    "line": "M3",
+    "direction": "southbound",
+    "origin_station_id": "MS04",
+    "destination_station_id": "MS13",
+    "stops_in_order": ["MS04", "MS12", "MS10", "MS11", "MS19", "MS13"],
+    "first_train_time": "05:52",
+    "last_train_time": "23:28",
+    "travel_time_from_origin_min": {
+      "MS04": 0,
+      "MS12": 3,
+      "MS10": 7,
+      "MS11": 9,
+      "MS19": 12,
+      "MS13": 14
+    },
+    "base_fare_usd": 0.80,
+    "per_stop_rate_usd": 0.30,
+    "frequency_min": 8,
+    "operates_on": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
+  },
+  {
+    "schedule_id": "MS_SCH07",
+    "line": "M4",
+    "direction": "eastbound",
+    "origin_station_id": "MS17",
+    "destination_station_id": "MS16",
+    "stops_in_order": ["MS17", "MS08", "MS12", "MS14", "MS15", "MS16"],
+    "first_train_time": "05:42",
+    "last_train_time": "23:24",
+    "travel_time_from_origin_min": {
+      "MS17": 0,
+      "MS08": 4,
+      "MS12": 8,
+      "MS14": 11,
+      "MS15": 13,
+      "MS16": 17
+    },
+    "base_fare_usd": 0.80,
+    "per_stop_rate_usd": 0.30,
+    "frequency_min": 7,
+    "operates_on": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
+  },
+  {
+    "schedule_id": "MS_SCH08",
+    "line": "M4",
+    "direction": "westbound",
+    "origin_station_id": "MS16",
+    "destination_station_id": "MS17",
+    "stops_in_order": ["MS16", "MS15", "MS14", "MS12", "MS08", "MS17"],
+    "first_train_time": "05:46",
+    "last_train_time": "23:31",
+    "travel_time_from_origin_min": {
+      "MS16": 0,
+      "MS15": 2,
+      "MS14": 4,
+      "MS12": 8,
+      "MS08": 12,
+      "MS17": 16
+    },
+    "base_fare_usd": 0.80,
+    "per_stop_rate_usd": 0.30,
+    "frequency_min": 7,
+    "operates_on": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
+  }
+]

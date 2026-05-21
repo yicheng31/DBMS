@@ -1,0 +1,146 @@
+[
+  {
+    "layout_id": "SL01",
+    "schedule_id": "NR_SCH01",
+    "coaches": [
+      {
+        "coach": "A",
+        "fare_class": "first",
+        "seats": [
+          { "seat_id": "A01", "row": 1, "column": "A" },
+          { "seat_id": "A02", "row": 1, "column": "B" },
+          { "seat_id": "A03", "row": 2, "column": "A" },
+          { "seat_id": "A04", "row": 2, "column": "B" },
+          { "seat_id": "A05", "row": 3, "column": "A" },
+          { "seat_id": "A06", "row": 3, "column": "B" }
+        ]
+      },
+      {
+        "coach": "B",
+        "fare_class": "standard",
+        "seats": [
+          { "seat_id": "B01", "row": 1, "column": "A" },
+          { "seat_id": "B02", "row": 1, "column": "B" },
+          { "seat_id": "B03", "row": 1, "column": "C" },
+          { "seat_id": "B04", "row": 2, "column": "A" },
+          { "seat_id": "B05", "row": 2, "column": "B" },
+          { "seat_id": "B06", "row": 2, "column": "C" },
+          { "seat_id": "B07", "row": 3, "column": "A" },
+          { "seat_id": "B08", "row": 3, "column": "B" },
+          { "seat_id": "B09", "row": 3, "column": "C" },
+          { "seat_id": "B10", "row": 4, "column": "A" },
+          { "seat_id": "B11", "row": 4, "column": "B" },
+          { "seat_id": "B12", "row": 4, "column": "C" }
+        ]
+      }
+    ]
+  },
+  {
+    "layout_id": "SL02",
+    "schedule_id": "NR_SCH02",
+    "coaches": [
+      {
+        "coach": "A",
+        "fare_class": "first",
+        "seats": [
+          { "seat_id": "A01", "row": 1, "column": "A" },
+          { "seat_id": "A02", "row": 1, "column": "B" },
+          { "seat_id": "A03", "row": 2, "column": "A" },
+          { "seat_id": "A04", "row": 2, "column": "B" },
+          { "seat_id": "A05", "row": 3, "column": "A" },
+          { "seat_id": "A06", "row": 3, "column": "B" }
+        ]
+      },
+      {
+        "coach": "B",
+        "fare_class": "standard",
+        "seats": [
+          { "seat_id": "B01", "row": 1, "column": "A" },
+          { "seat_id": "B02", "row": 1, "column": "B" },
+          { "seat_id": "B03", "row": 1, "column": "C" },
+          { "seat_id": "B04", "row": 2, "column": "A" },
+          { "seat_id": "B05", "row": 2, "column": "B" },
+          { "seat_id": "B06", "row": 2, "column": "C" },
+          { "seat_id": "B07", "row": 3, "column": "A" },
+          { "seat_id": "B08", "row": 3, "column": "B" },
+          { "seat_id": "B09", "row": 3, "column": "C" },
+          { "seat_id": "B10", "row": 4, "column": "A" },
+          { "seat_id": "B11", "row": 4, "column": "B" },
+          { "seat_id": "B12", "row": 4, "column": "C" }
+        ]
+      }
+    ]
+  },
+  {
+    "layout_id": "SL03",
+    "schedule_id": "NR_SCH03",
+    "coaches": [
+      {
+        "coach": "A",
+        "fare_class": "first",
+        "seats": [
+          { "seat_id": "A01", "row": 1, "column": "A" },
+          { "seat_id": "A02", "row": 1, "column": "B" },
+          { "seat_id": "A03", "row": 2, "column": "A" },
+          { "seat_id": "A04", "row": 2, "column": "B" },
+          { "seat_id": "A05", "row": 3, "column": "A" },
+          { "seat_id": "A06", "row": 3, "column": "B" }
+        ]
+      },
+      {
+        "coach": "B",
+        "fare_class": "standard",
+        "seats": [
+          { "seat_id": "B01", "row": 1, "column": "A" },
+          { "seat_id": "B02", "row": 1, "column": "B" },
+          { "seat_id": "B03", "row": 1, "column": "C" },
+          { "seat_id": "B04", "row": 2, "column": "A" },
+          { "seat_id": "B05", "row": 2, "column": "B" },
+          { "seat_id": "B06", "row": 2, "column": "C" },
+          { "seat_id": "B07", "row": 3, "column": "A" },
+          { "seat_id": "B08", "row": 3, "column": "B" },
+          { "seat_id": "B09", "row": 3, "column": "C" },
+          { "seat_id": "B10", "row": 4, "column": "A" },
+          { "seat_id": "B11", "row": 4, "column": "B" },
+          { "seat_id": "B12", "row": 4, "column": "C" }
+        ]
+      }
+    ]
+  },
+  {
+    "layout_id": "SL04",
+    "schedule_id": "NR_SCH04",
+    "coaches": [
+      {
+        "coach": "A",
+        "fare_class": "first",
+        "seats": [
+          { "seat_id": "A01", "row": 1, "column": "A" },
+          { "seat_id": "A02", "row": 1, "column": "B" },
+          { "seat_id": "A03", "row": 2, "column": "A" },
+          { "seat_id": "A04", "row": 2, "column": "B" },
+          { "seat_id": "A05", "row": 3, "column": "A" },
+          { "seat_id": "A06", "row": 3, "column": "B" }
+        ]
+      },
+      {
+        "coach": "B",
+        "fare_class": "standard",
+        "seats": [
+          { "seat_id": "B01", "row": 1, "column": "A" },
+          { "seat_id": "B02", "row": 1, "column": "B" },
+          { "seat_id": "B03", "row": 1, "column": "C" },
+          { "seat_id": "B04", "row": 2, "column": "A" },
+          { "seat_id": "B05", "row": 2, "column": "B" },
+          { "seat_id": "B06", "row": 2, "column": "C" },
+          { "seat_id": "B07", "row": 3, "column": "A" },
+          { "seat_id": "B08", "row": 3, "column": "B" },
+          { "seat_id": "B09", "row": 3, "column": "C" },
+          { "seat_id": "B10", "row": 4, "column": "A" },
+          { "seat_id": "B11", "row": 4, "column": "B" },
+          { "seat_id": "B12", "row": 4, "column": "C" }
+        ]
+      }
+    ]
+  }
+]

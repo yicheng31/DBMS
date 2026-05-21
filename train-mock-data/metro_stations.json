@@ -1,0 +1,264 @@
+[
+  {
+    "station_id": "MS01",
+    "name": "Central Square",
+    "lines": ["M1", "M2"],
+    "is_interchange_metro": true,
+    "interchange_metro_lines": ["M1", "M2"],
+    "is_interchange_national_rail": true,
+    "interchange_national_rail_station_id": "NR01",
+    "adjacent_stations": [
+      { "station_id": "MS05", "line": "M1", "travel_time_min": 3 },
+      { "station_id": "MS02", "line": "M1", "travel_time_min": 3 },
+      { "station_id": "MS06", "line": "M2", "travel_time_min": 3 },
+      { "station_id": "MS07", "line": "M2", "travel_time_min": 2 }
+    ]
+  },
+  {
+    "station_id": "MS02",
+    "name": "Riverside",
+    "lines": ["M1"],
+    "is_interchange_metro": false,
+    "interchange_metro_lines": [],
+    "is_interchange_national_rail": false,
+    "interchange_national_rail_station_id": null,
+    "adjacent_stations": [
+      { "station_id": "MS01", "line": "M1", "travel_time_min": 3 },
+      { "station_id": "MS03", "line": "M1", "travel_time_min": 2 }
+    ]
+  },
+  {
+    "station_id": "MS03",
+    "name": "Northgate",
+    "lines": ["M1"],
+    "is_interchange_metro": false,
+    "interchange_metro_lines": [],
+    "is_interchange_national_rail": false,
+    "interchange_national_rail_station_id": null,
+    "adjacent_stations": [
+      { "station_id": "MS02", "line": "M1", "travel_time_min": 2 },
+      { "station_id": "MS04", "line": "M1", "travel_time_min": 4 }
+    ]
+  },
+  {
+    "station_id": "MS04",
+    "name": "Elm Park",
+    "lines": ["M1", "M3"],
+    "is_interchange_metro": true,
+    "interchange_metro_lines": ["M1", "M3"],
+    "is_interchange_national_rail": false,
+    "interchange_national_rail_station_id": null,
+    "adjacent_stations": [
+      { "station_id": "MS03", "line": "M1", "travel_time_min": 4 },
+      { "station_id": "MS17", "line": "M1", "travel_time_min": 3 },
+      { "station_id": "MS12", "line": "M3", "travel_time_min": 3 }
+    ]
+  },
+  {
+    "station_id": "MS05",
+    "name": "Westfield",
+    "lines": ["M1"],
+    "is_interchange_metro": false,
+    "interchange_metro_lines": [],
+    "is_interchange_national_rail": false,
+    "interchange_national_rail_station_id": null,
+    "adjacent_stations": [
+      { "station_id": "MS20", "line": "M1", "travel_time_min": 2 },
+      { "station_id": "MS01", "line": "M1", "travel_time_min": 3 }
+    ]
+  },
+  {
+    "station_id": "MS06",
+    "name": "Harbour View",
+    "lines": ["M2"],
+    "is_interchange_metro": false,
+    "interchange_metro_lines": [],
+    "is_interchange_national_rail": false,
+    "interchange_national_rail_station_id": null,
+    "adjacent_stations": [
+      { "station_id": "MS01", "line": "M2", "travel_time_min": 3 }
+    ]
+  },
+  {
+    "station_id": "MS07",
+    "name": "Old Town",
+    "lines": ["M2"],
+    "is_interchange_metro": false,
+    "interchange_metro_lines": [],
+    "is_interchange_national_rail": true,
+    "interchange_national_rail_station_id": "NR03",
+    "adjacent_stations": [
+      { "station_id": "MS01", "line": "M2", "travel_time_min": 2 },
+      { "station_id": "MS18", "line": "M2", "travel_time_min": 2 }
+    ]
+  },
+  {
+    "station_id": "MS08",
+    "name": "University",
+    "lines": ["M2", "M4"],
+    "is_interchange_metro": true,
+    "interchange_metro_lines": ["M2", "M4"],
+    "is_interchange_national_rail": false,
+    "interchange_national_rail_station_id": null,
+    "adjacent_stations": [
+      { "station_id": "MS18", "line": "M2", "travel_time_min": 4 },
+      { "station_id": "MS09", "line": "M2", "travel_time_min": 3 },
+      { "station_id": "MS17", "line": "M4", "travel_time_min": 4 },
+      { "station_id": "MS12", "line": "M4", "travel_time_min": 4 }
+    ]
+  },
+  {
+    "station_id": "MS09",
+    "name": "Queensbridge",
+    "lines": ["M2"],
+    "is_interchange_metro": false,
+    "interchange_metro_lines": [],
+    "is_interchange_national_rail": false,
+    "interchange_national_rail_station_id": null,
+    "adjacent_stations": [
+      { "station_id": "MS08", "line": "M2", "travel_time_min": 3 }
+    ]
+  },
+  {
+    "station_id": "MS10",
+    "name": "Parkside",
+    "lines": ["M3"],
+    "is_interchange_metro": false,
+    "interchange_metro_lines": [],
+    "is_interchange_national_rail": false,
+    "interchange_national_rail_station_id": null,
+    "adjacent_stations": [
+      { "station_id": "MS11", "line": "M3", "travel_time_min": 2 },
+      { "station_id": "MS12", "line": "M3", "travel_time_min": 4 }
+    ]
+  },
+  {
+    "station_id": "MS11",
+    "name": "Greenhill",
+    "lines": ["M3"],
+    "is_interchange_metro": false,
+    "interchange_metro_lines": [],
+    "is_interchange_national_rail": false,
+    "interchange_national_rail_station_id": null,
+    "adjacent_stations": [
+      { "station_id": "MS10", "line": "M3", "travel_time_min": 2 },
+      { "station_id": "MS19", "line": "M3", "travel_time_min": 3 }
+    ]
+  },
+  {
+    "station_id": "MS12",
+    "name": "Lakeshore",
+    "lines": ["M3", "M4"],
+    "is_interchange_metro": true,
+    "interchange_metro_lines": ["M3", "M4"],
+    "is_interchange_national_rail": false,
+    "interchange_national_rail_station_id": null,
+    "adjacent_stations": [
+      { "station_id": "MS04", "line": "M3", "travel_time_min": 3 },
+      { "station_id": "MS10", "line": "M3", "travel_time_min": 4 },
+      { "station_id": "MS08", "line": "M4", "travel_time_min": 4 },
+      { "station_id": "MS14", "line": "M4", "travel_time_min": 4 }
+    ]
+  },
+  {
+    "station_id": "MS13",
+    "name": "Clifton",
+    "lines": ["M3"],
+    "is_interchange_metro": false,
+    "interchange_metro_lines": [],
+    "is_interchange_national_rail": false,
+    "interchange_national_rail_station_id": null,
+    "adjacent_stations": [
+      { "station_id": "MS19", "line": "M3", "travel_time_min": 2 }
+    ]
+  },
+  {
+    "station_id": "MS14",
+    "name": "Eastwick",
+    "lines": ["M4"],
+    "is_interchange_metro": false,
+    "interchange_metro_lines": [],
+    "is_interchange_national_rail": false,
+    "interchange_national_rail_station_id": null,
+    "adjacent_stations": [
+      { "station_id": "MS12", "line": "M4", "travel_time_min": 4 },
+      { "station_id": "MS15", "line": "M4", "travel_time_min": 2 }
+    ]
+  },
+  {
+    "station_id": "MS15",
+    "name": "Ferndale",
+    "lines": ["M4"],
+    "is_interchange_metro": false,
+    "interchange_metro_lines": [],
+    "is_interchange_national_rail": true,
+    "interchange_national_rail_station_id": "NR07",
+    "adjacent_stations": [
+      { "station_id": "MS14", "line": "M4", "travel_time_min": 2 },
+      { "station_id": "MS16", "line": "M4", "travel_time_min": 3 }
+    ]
+  },
+  {
+    "station_id": "MS16",
+    "name": "Hilltop",
+    "lines": ["M4"],
+    "is_interchange_metro": false,
+    "interchange_metro_lines": [],
+    "is_interchange_national_rail": false,
+    "interchange_national_rail_station_id": null,
+    "adjacent_stations": [
+      { "station_id": "MS15", "line": "M4", "travel_time_min": 3 }
+    ]
+  },
+  {
+    "station_id": "MS17",
+    "name": "Broadmoor",
+    "lines": ["M1", "M4"],
+    "is_interchange_metro": true,
+    "interchange_metro_lines": ["M1", "M4"],
+    "is_interchange_national_rail": false,
+    "interchange_national_rail_station_id": null,
+    "adjacent_stations": [
+      { "station_id": "MS04", "line": "M1", "travel_time_min": 3 },
+      { "station_id": "MS08", "line": "M4", "travel_time_min": 4 }
+    ]
+  },
+  {
+    "station_id": "MS18",
+    "name": "Sunnyvale",
+    "lines": ["M2"],
+    "is_interchange_metro": false,
+    "interchange_metro_lines": [],
+    "is_interchange_national_rail": false,
+    "interchange_national_rail_station_id": null,
+    "adjacent_stations": [
+      { "station_id": "MS07", "line": "M2", "travel_time_min": 2 },
+      { "station_id": "MS08", "line": "M2", "travel_time_min": 4 }
+    ]
+  },
+  {
+    "station_id": "MS19",
+    "name": "Redwood",
+    "lines": ["M3"],
+    "is_interchange_metro": false,
+    "interchange_metro_lines": [],
+    "is_interchange_national_rail": false,
+    "interchange_national_rail_station_id": null,
+    "adjacent_stations": [
+      { "station_id": "MS13", "line": "M3", "travel_time_min": 2 },
+      { "station_id": "MS11", "line": "M3", "travel_time_min": 3 }
+    ]
+  },
+  {
+    "station_id": "MS20",
+    "name": "Thornton",
+    "lines": ["M1"],
+    "is_interchange_metro": false,
+    "interchange_metro_lines": [],
+    "is_interchange_national_rail": false,
+    "interchange_national_rail_station_id": null,
+    "adjacent_stations": [
+      { "station_id": "MS05", "line": "M1", "travel_time_min": 2 }
+    ]
+  }
+]

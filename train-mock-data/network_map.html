@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>City Transit Network Map</title>
+<style>
+  body { margin: 0; padding: 20px; background: #ddd; font-family: Arial, Helvetica, sans-serif; }
+  h1 { text-align: center; color: #222; font-size: 17px; margin-bottom: 14px; letter-spacing: 1px; }
+  svg { display: block; margin: 0 auto; background: #fff; border-radius: 10px; box-shadow: 0 3px 18px rgba(0,0,0,0.2); }
+  .edge-time { font-size: 9px; fill: #aaa; font-family: Arial; }
+</style>
+</head>
+<body>
+<h1>CITY TRANSIT NETWORK MAP</h1>
+<svg viewBox="0 0 1260 840" width="1260" height="840" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- Background zones -->
+  <rect x="8" y="8"   width="1244" height="260" rx="8" fill="#f9f4ff" stroke="#c8a0e0" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <rect x="8" y="282" width="1244" height="498" rx="8" fill="#f0f8ff" stroke="#90b8d8" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="22" y="30" font-size="11" font-weight="bold" fill="#6030a0" letter-spacing="1">NATIONAL RAIL NETWORK</text>
+  <text x="22" y="302" font-size="11" font-weight="bold" fill="#005599" letter-spacing="1">METRO NETWORK</text>
+
+  <!-- ══════════════════════════════════════════
+       NATIONAL RAIL LINES
+  ══════════════════════════════════════════ -->
+
+  <!-- NR1 (purple): NR01→NR02→NR03→NR04→NR05 -->
+  <line x1="280" y1="118" x2="430" y2="88"  stroke="#7030a0" stroke-width="5" stroke-linecap="round"/>
+  <line x1="430" y1="88"  x2="590" y2="124" stroke="#7030a0" stroke-width="5" stroke-linecap="round"/>
+  <line x1="590" y1="124" x2="760" y2="94"  stroke="#7030a0" stroke-width="5" stroke-linecap="round"/>
+  <line x1="760" y1="94"  x2="920" y2="74"  stroke="#7030a0" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- NR2 (teal): NR01→NR06→NR07→NR08→NR09→NR10 -->
+  <line x1="280"  y1="118" x2="352"  y2="208" stroke="#007070" stroke-width="5" stroke-linecap="round"/>
+  <line x1="352"  y1="208" x2="800"  y2="218" stroke="#007070" stroke-width="5" stroke-linecap="round"/>
+  <line x1="800"  y1="218" x2="900"  y2="213" stroke="#007070" stroke-width="5" stroke-linecap="round"/>
+  <line x1="900"  y1="213" x2="1012" y2="218" stroke="#007070" stroke-width="5" stroke-linecap="round"/>
+  <line x1="1012" y1="218" x2="1122" y2="208" stroke="#007070" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- NR edge travel-time labels -->
+  <!-- NR1 -->
+  <text class="edge-time" x="355" y="96"  text-anchor="middle">12 min</text>
+  <text class="edge-time" x="510" y="99"  text-anchor="middle">18 min</text>
+  <text class="edge-time" x="675" y="102" text-anchor="middle">15 min</text>
+  <text class="edge-time" x="840" y="77"  text-anchor="middle">20 min</text>
+  <!-- NR2 -->
+  <text class="edge-time" x="306" y="168" text-anchor="middle">14 min</text>
+  <text class="edge-time" x="576" y="206" text-anchor="middle">16 min</text>
+  <text class="edge-time" x="850" y="208" text-anchor="middle">22 min</text>
+  <text class="edge-time" x="956" y="208" text-anchor="middle">21 min</text>
+  <text class="edge-time" x="1067" y="208" text-anchor="middle">19 min</text>
+
+  <!-- ══════════════════════════════════════════
+       METRO LINES
+  ══════════════════════════════════════════ -->
+
+  <!-- M1 (blue): MS20→MS05→MS01→MS02→MS03→MS04→MS17 -->
+  <line x1="70"  y1="342" x2="200" y2="342" stroke="#009FE3" stroke-width="7" stroke-linecap="round"/>
+  <line x1="200" y1="342" x2="370" y2="342" stroke="#009FE3" stroke-width="7" stroke-linecap="round"/>
+  <line x1="370" y1="342" x2="490" y2="342" stroke="#009FE3" stroke-width="7" stroke-linecap="round"/>
+  <line x1="490" y1="342" x2="605" y2="342" stroke="#009FE3" stroke-width="7" stroke-linecap="round"/>
+  <line x1="605" y1="342" x2="730" y2="342" stroke="#009FE3" stroke-width="7" stroke-linecap="round"/>
+  <line x1="730" y1="342" x2="910" y2="342" stroke="#009FE3" stroke-width="7" stroke-linecap="round"/>
+
+  <!-- M2 (red): MS06→MS01→MS07→MS18→MS08→MS09 -->
+  <line x1="70"  y1="458" x2="370" y2="342" stroke="#E31E25" stroke-width="7" stroke-linecap="round"/>
+  <line x1="370" y1="342" x2="455" y2="458" stroke="#E31E25" stroke-width="7" stroke-linecap="round"/>
+  <line x1="455" y1="458" x2="565" y2="458" stroke="#E31E25" stroke-width="7" stroke-linecap="round"/>
+  <line x1="565" y1="458" x2="730" y2="458" stroke="#E31E25" stroke-width="7" stroke-linecap="round"/>
+  <line x1="730" y1="458" x2="862" y2="458" stroke="#E31E25" stroke-width="7" stroke-linecap="round"/>
+
+  <!-- M3 (green): MS04→MS12→MS10→MS11→MS19→MS13 -->
+  <line x1="730" y1="342" x2="800" y2="492" stroke="#00A650" stroke-width="7" stroke-linecap="round"/>
+  <line x1="800" y1="492" x2="800" y2="562" stroke="#00A650" stroke-width="7" stroke-linecap="round"/>
+  <line x1="800" y1="562" x2="800" y2="626" stroke="#00A650" stroke-width="7" stroke-linecap="round"/>
+  <line x1="800" y1="626" x2="800" y2="688" stroke="#00A650" stroke-width="7" stroke-linecap="round"/>
+  <line x1="800" y1="688" x2="800" y2="752" stroke="#00A650" stroke-width="7" stroke-linecap="round"/>
+
+  <!-- M4 (orange): MS17→MS08→MS12→MS14→MS15→MS16 -->
+  <line x1="910" y1="342" x2="730" y2="458" stroke="#F7941D" stroke-width="7" stroke-linecap="round"/>
+  <line x1="730" y1="458" x2="800" y2="492" stroke="#F7941D" stroke-width="7" stroke-linecap="round"/>
+  <line x1="800" y1="492" x2="912" y2="562" stroke="#F7941D" stroke-width="7" stroke-linecap="round"/>
+  <line x1="912" y1="562" x2="996" y2="618" stroke="#F7941D" stroke-width="7" stroke-linecap="round"/>
+  <line x1="996" y1="618" x2="1092" y2="548" stroke="#F7941D" stroke-width="7" stroke-linecap="round"/>
+
+  <!-- Metro edge travel-time labels -->
+  <!-- M1 (above the horizontal line, y=332) -->
+  <text class="edge-time" x="135"  y="334" text-anchor="middle">2</text>
+  <text class="edge-time" x="285"  y="334" text-anchor="middle">3</text>
+  <text class="edge-time" x="430"  y="334" text-anchor="middle">3</text>
+  <text class="edge-time" x="548"  y="334" text-anchor="middle">2</text>
+  <text class="edge-time" x="668"  y="334" text-anchor="middle">4</text>
+  <text class="edge-time" x="820"  y="334" text-anchor="middle">3</text>
+  <!-- M2 diagonals (offset from line) -->
+  <text class="edge-time" x="206"  y="392" text-anchor="middle">3</text>
+  <text class="edge-time" x="404"  y="392" text-anchor="middle">2</text>
+  <!-- M2 horizontals (below the line, y=468) -->
+  <text class="edge-time" x="510"  y="470" text-anchor="middle">2</text>
+  <text class="edge-time" x="648"  y="470" text-anchor="middle">4</text>
+  <text class="edge-time" x="796"  y="470" text-anchor="middle">3</text>
+  <!-- M3 (left of the vertical line, text-anchor=end x=790) -->
+  <text class="edge-time" x="759"  y="424" text-anchor="middle">3</text>
+  <text class="edge-time" x="789"  y="530" text-anchor="end">4</text>
+  <text class="edge-time" x="789"  y="597" text-anchor="end">2</text>
+  <text class="edge-time" x="789"  y="660" text-anchor="end">3</text>
+  <text class="edge-time" x="789"  y="723" text-anchor="end">2</text>
+  <!-- M4 diagonals -->
+  <text class="edge-time" x="828"  y="393" text-anchor="middle">4</text>
+  <text class="edge-time" x="759"  y="482" text-anchor="middle">4</text>
+  <text class="edge-time" x="864"  y="520" text-anchor="middle">4</text>
+  <text class="edge-time" x="960"  y="582" text-anchor="middle">2</text>
+  <text class="edge-time" x="1048" y="576" text-anchor="middle">3</text>
+
+  <!-- ══════════════════════════════════════════
+       INTERCHANGE LINKS (dashed)
+  ══════════════════════════════════════════ -->
+  <line x1="370" y1="342" x2="280" y2="118" stroke="#999" stroke-width="2" stroke-dasharray="8,5"/>
+  <line x1="455" y1="458" x2="590" y2="124" stroke="#999" stroke-width="2" stroke-dasharray="8,5"/>
+  <line x1="996" y1="618" x2="800" y2="218" stroke="#999" stroke-width="2" stroke-dasharray="8,5"/>
+
+  <!-- ══════════════════════════════════════════
+       NATIONAL RAIL STATION NODES
+  ══════════════════════════════════════════ -->
+
+  <!-- NR01 Central Station (NR1+NR2, ↔ MS01) -->
+  <circle cx="280" cy="118" r="11" fill="white" stroke="#333" stroke-width="3"/>
+  <text x="294" y="113" font-size="10" font-weight="bold" fill="#111">Central Station</text>
+  <text x="294" y="125" font-size="9"  fill="#999">NR01 · NR1+NR2 · ↔ Metro</text>
+
+  <!-- NR02 Maplewood -->
+  <circle cx="430" cy="88" r="7" fill="white" stroke="#7030a0" stroke-width="2.5"/>
+  <text x="436" y="83" font-size="10" fill="#333">Maplewood</text>
+  <text x="436" y="94" font-size="9"  fill="#999">NR02</text>
+
+  <!-- NR03 Old Town Junction (↔ MS07) -->
+  <circle cx="590" cy="124" r="10" fill="white" stroke="#333" stroke-width="2.5"/>
+  <text x="602" y="119" font-size="10" font-weight="bold" fill="#111">Old Town Jn.</text>
+  <text x="602" y="130" font-size="9"  fill="#999">NR03 · ↔ Metro</text>
+
+  <!-- NR04 Ashford -->
+  <circle cx="760" cy="94" r="7" fill="white" stroke="#7030a0" stroke-width="2.5"/>
+  <text x="766" y="89" font-size="10" fill="#333">Ashford</text>
+  <text x="766" y="100" font-size="9" fill="#999">NR04</text>
+
+  <!-- NR05 Stonehaven (terminus) -->
+  <circle cx="920" cy="74" r="7" fill="white" stroke="#7030a0" stroke-width="2.5"/>
+  <text x="926" y="69" font-size="10" fill="#333">Stonehaven</text>
+  <text x="926" y="80" font-size="9"  fill="#999">NR05</text>
+
+  <!-- NR06 Bridgeport -->
+  <circle cx="352" cy="208" r="7" fill="white" stroke="#007070" stroke-width="2.5"/>
+  <text x="358" y="203" font-size="10" fill="#333">Bridgeport</text>
+  <text x="358" y="214" font-size="9"  fill="#999">NR06</text>
+
+  <!-- NR07 Ferndale Halt (↔ MS15) -->
+  <circle cx="800" cy="218" r="10" fill="white" stroke="#333" stroke-width="2.5"/>
+  <text x="812" y="213" font-size="10" font-weight="bold" fill="#111">Ferndale Halt</text>
+  <text x="812" y="224" font-size="9"  fill="#999">NR07 · ↔ Metro</text>
+
+  <!-- NR08 Coalport -->
+  <circle cx="900" cy="213" r="7" fill="white" stroke="#007070" stroke-width="2.5"/>
+  <text x="906" y="208" font-size="10" fill="#333">Coalport</text>
+  <text x="906" y="219" font-size="9"  fill="#999">NR08</text>
+
+  <!-- NR09 Dunmore -->
+  <circle cx="1012" cy="218" r="7" fill="white" stroke="#007070" stroke-width="2.5"/>
+  <text x="1018" y="213" font-size="10" fill="#333">Dunmore</text>
+  <text x="1018" y="224" font-size="9"  fill="#999">NR09</text>
+
+  <!-- NR10 Langford End (terminus) — label left -->
+  <circle cx="1122" cy="208" r="7" fill="white" stroke="#007070" stroke-width="2.5"/>
+  <text x="1116" y="203" font-size="10" fill="#333" text-anchor="end">Langford End</text>
+  <text x="1116" y="214" font-size="9"  fill="#999" text-anchor="end">NR10</text>
+
+  <!-- ══════════════════════════════════════════
+       METRO STATION NODES
+  ══════════════════════════════════════════ -->
+
+  <!-- MS01 Central Square (M1+M2, ↔ NR01) — label left -->
+  <circle cx="370" cy="342" r="13" fill="white" stroke="#111" stroke-width="3.5"/>
+  <text x="356" y="335" font-size="10" font-weight="bold" fill="#111" text-anchor="end">Central Square</text>
+  <text x="356" y="347" font-size="9"  fill="#999" text-anchor="end">MS01 · M1+M2 · ↔ NR</text>
+
+  <!-- MS04 Elm Park (M1+M3) -->
+  <circle cx="730" cy="342" r="11" fill="white" stroke="#222" stroke-width="3"/>
+  <text x="736" y="334" font-size="10" font-weight="bold" fill="#111">Elm Park</text>
+  <text x="736" y="346" font-size="9"  fill="#999">MS04 · M1+M3</text>
+
+  <!-- MS17 Broadmoor (M1+M4) -->
+  <circle cx="910" cy="342" r="11" fill="white" stroke="#222" stroke-width="3"/>
+  <text x="916" y="334" font-size="10" font-weight="bold" fill="#111">Broadmoor</text>
+  <text x="916" y="346" font-size="9"  fill="#999">MS17 · M1+M4</text>
+
+  <!-- MS08 University (M2+M4) -->
+  <circle cx="730" cy="458" r="11" fill="white" stroke="#222" stroke-width="3"/>
+  <text x="718" y="450" font-size="10" font-weight="bold" fill="#111" text-anchor="end">University</text>
+  <text x="718" y="462" font-size="9"  fill="#999" text-anchor="end">MS08 · M2+M4</text>
+
+  <!-- MS12 Lakeshore (M3+M4) -->
+  <circle cx="800" cy="492" r="11" fill="white" stroke="#222" stroke-width="3"/>
+  <text x="813" y="488" font-size="10" font-weight="bold" fill="#111">Lakeshore</text>
+  <text x="813" y="500" font-size="9"  fill="#999">MS12 · M3+M4</text>
+
+  <!-- MS07 Old Town (M2, ↔ NR03) -->
+  <circle cx="455" cy="458" r="10" fill="white" stroke="#222" stroke-width="2.5"/>
+  <text x="461" y="450" font-size="10" font-weight="bold" fill="#111">Old Town</text>
+  <text x="461" y="462" font-size="9"  fill="#999">MS07 · ↔ NR</text>
+
+  <!-- MS15 Ferndale (M4, ↔ NR07) -->
+  <circle cx="996" cy="618" r="10" fill="white" stroke="#222" stroke-width="2.5"/>
+  <text x="1004" y="610" font-size="10" font-weight="bold" fill="#111">Ferndale</text>
+  <text x="1004" y="622" font-size="9"  fill="#999">MS15 · ↔ NR</text>
+
+  <!-- MS20 Thornton (M1 terminus W) -->
+  <circle cx="70" cy="342" r="7" fill="white" stroke="#009FE3" stroke-width="2.5"/>
+  <text x="76" y="335" font-size="10" fill="#333">Thornton</text>
+  <text x="76" y="347" font-size="9"  fill="#999">MS20</text>
+
+  <!-- MS05 Westfield -->
+  <circle cx="200" cy="342" r="7" fill="white" stroke="#009FE3" stroke-width="2.5"/>
+  <text x="206" y="335" font-size="10" fill="#333">Westfield</text>
+  <text x="206" y="347" font-size="9"  fill="#999">MS05</text>
+
+  <!-- MS02 Riverside -->
+  <circle cx="490" cy="342" r="7" fill="white" stroke="#009FE3" stroke-width="2.5"/>
+  <text x="496" y="335" font-size="10" fill="#333">Riverside</text>
+  <text x="496" y="347" font-size="9"  fill="#999">MS02</text>
+
+  <!-- MS03 Northgate -->
+  <circle cx="605" cy="342" r="7" fill="white" stroke="#009FE3" stroke-width="2.5"/>
+  <text x="611" y="335" font-size="10" fill="#333">Northgate</text>
+  <text x="611" y="347" font-size="9"  fill="#999">MS03</text>
+
+  <!-- MS06 Harbour View (M2 terminus W) -->
+  <circle cx="70" cy="458" r="7" fill="white" stroke="#E31E25" stroke-width="2.5"/>
+  <text x="76" y="451" font-size="10" fill="#333">Harbour View</text>
+  <text x="76" y="463" font-size="9"  fill="#999">MS06</text>
+
+  <!-- MS18 Sunnyvale -->
+  <circle cx="565" cy="458" r="7" fill="white" stroke="#E31E25" stroke-width="2.5"/>
+  <text x="571" y="451" font-size="10" fill="#333">Sunnyvale</text>
+  <text x="571" y="463" font-size="9"  fill="#999">MS18</text>
+
+  <!-- MS09 Queensbridge (M2 terminus E) — label left -->
+  <circle cx="862" cy="458" r="7" fill="white" stroke="#E31E25" stroke-width="2.5"/>
+  <text x="854" y="451" font-size="10" fill="#333" text-anchor="end">Queensbridge</text>
+  <text x="854" y="463" font-size="9"  fill="#999" text-anchor="end">MS09</text>
+
+  <!-- MS10 Parkside -->
+  <circle cx="800" cy="562" r="7" fill="white" stroke="#00A650" stroke-width="2.5"/>
+  <text x="810" y="557" font-size="10" fill="#333">Parkside</text>
+  <text x="810" y="569" font-size="9"  fill="#999">MS10</text>
+
+  <!-- MS11 Greenhill -->
+  <circle cx="800" cy="626" r="7" fill="white" stroke="#00A650" stroke-width="2.5"/>
+  <text x="810" y="621" font-size="10" fill="#333">Greenhill</text>
+  <text x="810" y="633" font-size="9"  fill="#999">MS11</text>
+
+  <!-- MS19 Redwood -->
+  <circle cx="800" cy="688" r="7" fill="white" stroke="#00A650" stroke-width="2.5"/>
+  <text x="810" y="683" font-size="10" fill="#333">Redwood</text>
+  <text x="810" y="695" font-size="9"  fill="#999">MS19</text>
+
+  <!-- MS13 Clifton (M3 terminus S) -->
+  <circle cx="800" cy="752" r="7" fill="white" stroke="#00A650" stroke-width="2.5"/>
+  <text x="810" y="747" font-size="10" fill="#333">Clifton</text>
+  <text x="810" y="759" font-size="9"  fill="#999">MS13</text>
+
+  <!-- MS14 Eastwick -->
+  <circle cx="912" cy="562" r="7" fill="white" stroke="#F7941D" stroke-width="2.5"/>
+  <text x="920" y="557" font-size="10" fill="#333">Eastwick</text>
+  <text x="920" y="569" font-size="9"  fill="#999">MS14</text>
+
+  <!-- MS16 Hilltop (M4 terminus E) -->
+  <circle cx="1092" cy="548" r="7" fill="white" stroke="#F7941D" stroke-width="2.5"/>
+  <text x="1100" y="543" font-size="10" fill="#333">Hilltop</text>
+  <text x="1100" y="555" font-size="9"  fill="#999">MS16</text>
+
+  <!-- ══════════════════════════════════════════
+       LEGEND
+  ══════════════════════════════════════════ -->
+  <rect x="10" y="790" width="1240" height="44" rx="6" fill="#f4f4f4" stroke="#ddd" stroke-width="1"/>
+
+  <!-- Lines -->
+  <text x="20"  y="808" font-size="10" font-weight="bold" fill="#444">Lines:</text>
+  <line x1="60"  y1="804" x2="86"  y2="804" stroke="#009FE3" stroke-width="5"/>
+  <text x="90"  y="808" font-size="10" fill="#333">M1</text>
+  <line x1="112" y1="804" x2="138" y2="804" stroke="#E31E25" stroke-width="5"/>
+  <text x="142" y="808" font-size="10" fill="#333">M2</text>
+  <line x1="164" y1="804" x2="190" y2="804" stroke="#00A650" stroke-width="5"/>
+  <text x="194" y="808" font-size="10" fill="#333">M3</text>
+  <line x1="216" y1="804" x2="242" y2="804" stroke="#F7941D" stroke-width="5"/>
+  <text x="246" y="808" font-size="10" fill="#333">M4</text>
+  <line x1="268" y1="804" x2="294" y2="804" stroke="#7030a0" stroke-width="5"/>
+  <text x="298" y="808" font-size="10" fill="#333">NR1</text>
+  <line x1="326" y1="804" x2="352" y2="804" stroke="#007070" stroke-width="5"/>
+  <text x="356" y="808" font-size="10" fill="#333">NR2</text>
+  <line x1="390" y1="804" x2="414" y2="804" stroke="#999" stroke-width="2" stroke-dasharray="6,4"/>
+  <text x="418" y="808" font-size="10" fill="#333">Metro ↔ Rail link</text>
+
+  <!-- Stations -->
+  <text x="552" y="808" font-size="10" font-weight="bold" fill="#444">Stations:</text>
+  <circle cx="614" cy="804" r="9" fill="white" stroke="#222" stroke-width="3"/>
+  <text x="626" y="808" font-size="10" fill="#333">Multi-line interchange</text>
+  <circle cx="762" cy="804" r="7" fill="white" stroke="#888" stroke-width="2"/>
+  <text x="772" y="808" font-size="10" fill="#333">Single-line station</text>
+
+  <!-- Edge labels -->
+  <text x="900" y="808" font-size="10" font-weight="bold" fill="#444">Edge labels:</text>
+  <text x="974" y="808" font-size="9" fill="#aaa">NR = minutes between stations · Metro = minutes between stations</text>
+
+</svg>
+</body>
+</html>

@@ -1,0 +1,174 @@
+[
+  {
+    "policy_id": "RF001",
+    "label": "National Rail – Normal Service – Single or Return",
+    "applies_to": {
+      "network_type": "national_rail",
+      "service_type": "normal",
+      "ticket_types": ["single", "return"]
+    },
+    "cancellation_windows": [
+      {
+        "window_id": "RF001_W1",
+        "label": "Early cancellation",
+        "condition": "Cancellation requested 48 or more hours before scheduled departure",
+        "hours_before_departure_min": 48,
+        "hours_before_departure_max": null,
+        "refund_percent": 100,
+        "admin_fee_usd": 0.00
+      },
+      {
+        "window_id": "RF001_W2",
+        "label": "Standard cancellation",
+        "condition": "Cancellation requested between 24 and 48 hours before scheduled departure",
+        "hours_before_departure_min": 24,
+        "hours_before_departure_max": 48,
+        "refund_percent": 75,
+        "admin_fee_usd": 0.50
+      },
+      {
+        "window_id": "RF001_W3",
+        "label": "Late cancellation",
+        "condition": "Cancellation requested between 2 and 24 hours before scheduled departure",
+        "hours_before_departure_min": 2,
+        "hours_before_departure_max": 24,
+        "refund_percent": 50,
+        "admin_fee_usd": 0.50
+      },
+      {
+        "window_id": "RF001_W4",
+        "label": "No refund",
+        "condition": "Cancellation requested less than 2 hours before departure, or after departure time has passed",
+        "hours_before_departure_min": 0,
+        "hours_before_departure_max": 2,
+        "refund_percent": 0,
+        "admin_fee_usd": 0.00
+      }
+    ],
+    "return_ticket_notes": "For return tickets, each leg is assessed independently. If the outbound leg has already been travelled, only the return leg amount is eligible for refund, assessed against the return departure time.",
+    "no_show_policy": "Passengers who do not travel and do not cancel in advance are treated as a no-show. No refund is issued for no-shows."
+  },
+  {
+    "policy_id": "RF002",
+    "label": "National Rail – Express Service – Single or Return",
+    "applies_to": {
+      "network_type": "national_rail",
+      "service_type": "express",
+      "ticket_types": ["single", "return"]
+    },
+    "cancellation_windows": [
+      {
+        "window_id": "RF002_W1",
+        "label": "Early cancellation",
+        "condition": "Cancellation requested 48 or more hours before scheduled departure",
+        "hours_before_departure_min": 48,
+        "hours_before_departure_max": null,
+        "refund_percent": 100,
+        "admin_fee_usd": 1.00
+      },
+      {
+        "window_id": "RF002_W2",
+        "label": "Late cancellation",
+        "condition": "Cancellation requested between 24 and 48 hours before scheduled departure",
+        "hours_before_departure_min": 24,
+        "hours_before_departure_max": 48,
+        "refund_percent": 50,
+        "admin_fee_usd": 1.00
+      },
+      {
+        "window_id": "RF002_W3",
+        "label": "No refund",
+        "condition": "Cancellation requested less than 24 hours before departure, or after departure time has passed",
+        "hours_before_departure_min": 0,
+        "hours_before_departure_max": 24,
+        "refund_percent": 0,
+        "admin_fee_usd": 0.00
+      }
+    ],
+    "return_ticket_notes": "Same as normal service: each leg assessed independently against its own departure time.",
+    "no_show_policy": "No refund issued for no-shows on express services."
+  },
+  {
+    "policy_id": "RF003",
+    "label": "Metro – Single Ticket",
+    "applies_to": {
+      "network_type": "metro",
+      "ticket_types": ["single"]
+    },
+    "cancellation_windows": [
+      {
+        "window_id": "RF003_W1",
+        "label": "Full refund",
+        "condition": "Cancellation requested before the passenger has tapped in at the origin station",
+        "status_condition": "Booking status is 'confirmed' and journey has not commenced",
+        "refund_percent": 100,
+        "admin_fee_usd": 0.00
+      },
+      {
+        "window_id": "RF003_W2",
+        "label": "No refund",
+        "condition": "Journey has already commenced (passenger has tapped in)",
+        "status_condition": "Booking status is 'completed' or travelled_at is not null",
+        "refund_percent": 0,
+        "admin_fee_usd": 0.00
+      }
+    ],
+    "notes": "Metro single tickets are valid on the travel date only. A booking with status 'cancelled' is already cancelled and no further refund action is needed."
+  },
+  {
+    "policy_id": "RF004",
+    "label": "Metro – Day Pass",
+    "applies_to": {
+      "network_type": "metro",
+      "ticket_types": ["day_pass"]
+    },
+    "cancellation_windows": [
+      {
+        "window_id": "RF004_W1",
+        "label": "Full refund",
+        "condition": "Cancellation requested before the passenger has made their first tap-in on the travel date",
+        "status_condition": "Booking status is 'confirmed' and travelled_at is null",
+        "refund_percent": 100,
+        "admin_fee_usd": 0.00
+      },
+      {
+        "window_id": "RF004_W2",
+        "label": "No refund",
+        "condition": "Day pass has been activated (first tap-in recorded)",
+        "status_condition": "Booking status is 'completed' or travelled_at is not null",
+        "refund_percent": 0,
+        "admin_fee_usd": 0.00
+      }
+    ],
+    "notes": "Day passes are non-transferable and valid only for the calendar day of purchase."
+  },
+  {
+    "policy_id": "RF005",
+    "label": "Delay Compensation – All Networks",
+    "applies_to": {
+      "network_type": "all",
+      "ticket_types": ["single", "return", "day_pass"]
+    },
+    "compensation_rules": [
+      {
+        "rule_id": "RF005_R1",
+        "condition": "Train delayed 30–59 minutes due to operator fault",
+        "compensation": "50% refund of the fare for the delayed leg",
+        "how_to_claim": "Submit claim via app or customer service within 28 days of travel date"
+      },
+      {
+        "rule_id": "RF005_R2",
+        "condition": "Train delayed 60–119 minutes due to operator fault",
+        "compensation": "100% refund of the fare for the delayed leg",
+        "how_to_claim": "Submit claim via app or customer service within 28 days of travel date"
+      },
+      {
+        "rule_id": "RF005_R3",
+        "condition": "Train delayed 120 minutes or more due to operator fault",
+        "compensation": "100% refund of the fare for the delayed leg, plus reimbursement of alternative transport costs up to $10.00",
+        "how_to_claim": "Submit claim with receipts via customer service within 28 days of travel date"
+      }
+    ],
+    "exclusions": "Delays caused by third-party events (extreme weather, security incidents, government directives, or passenger-caused incidents) are not eligible for compensation."
+  }
+]
