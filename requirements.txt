@@ -14,3 +14,4 @@ gradio>=4.36.0
 
 # Utilities
 python-dotenv>=1.0.0         # Load .env file
+argon2-cffi>=23.1.0          # Argon2id password hashing
