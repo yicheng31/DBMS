@@ -270,6 +270,33 @@ def query_metro_fare(schedule_id: str, stops_travelled: int) -> Optional[dict]:
             return dict(row) if row else None
 
 
+def query_metro_fare_estimate(stops_travelled: int) -> Optional[dict]:
+    """
+    Estimate a metro fare using the configured PostgreSQL metro fare rule.
+
+    This is used when route planning comes from Neo4j and there is no single
+    direct metro schedule covering the full journey.
+    """
+    if stops_travelled <= 0:
+        return None
+
+    sql = """
+        SELECT
+            base_fare_usd,
+            per_stop_rate_usd,
+            base_fare_usd + (%s * per_stop_rate_usd) AS total_fare_usd
+        FROM metro_schedules
+        GROUP BY base_fare_usd, per_stop_rate_usd
+        ORDER BY COUNT(*) DESC, base_fare_usd, per_stop_rate_usd
+        LIMIT 1
+    """
+    with _connect() as conn:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            cur.execute(sql, (stops_travelled,))
+            row = cur.fetchone()
+            return dict(row) if row else None
+
+
 # ── SEAT SELECTION ────────────────────────────────────────────────────────────
 
 def query_available_seats(
