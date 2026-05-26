@@ -357,7 +357,29 @@ def _execute_tool(
                 destination_id=params["destination_id"],
             )
             if not schedules:
-                result = {"error": "很抱歉，找不到這兩站之間的捷運服務。請確認站點代碼是否正確。"}
+                route = query_shortest_route(
+                    origin_id=params["origin_id"],
+                    destination_id=params["destination_id"],
+                    network="metro",
+                )
+                if not route.get("found"):
+                    result = {
+                        "error": "很抱歉，找不到這兩站之間的捷運服務。請確認站點代碼是否正確。"
+                    }
+                else:
+                    result = {
+                        "origin": route["path"][0]["name"],
+                        "destination": route["path"][-1]["name"],
+                        "fare_source": "graph_route_estimate",
+                        "note": (
+                            "No direct metro schedule was found in PostgreSQL; "
+                            "this fare is estimated from the Neo4j route legs."
+                        ),
+                        "total_fare_usd": route["total_fare_usd"],
+                        "total_time_min": route["total_time_min"],
+                        "stations": route["stations"],
+                        "legs": route["legs"],
+                    }
             else:
                 sched = schedules[0]
                 stops_travelled = sched.get("stops_travelled", 1)
@@ -365,6 +387,7 @@ def _execute_tool(
                 result = {
                     "origin": sched.get("origin_name", params["origin_id"]),
                     "destination": sched.get("destination_name", params["destination_id"]),
+                    "fare_source": "postgres_direct_schedule",
                     "line": sched.get("line"),
                     "schedule_id": sched["schedule_id"],
                     "stops_travelled": stops_travelled,
