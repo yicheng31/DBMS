@@ -36,6 +36,69 @@
 --  stored as unique external codes so their display format can change.
 -- ============================================================
 
+DO $$
+BEGIN
+    CREATE TYPE day_of_week_enum AS ENUM ('mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun');
+EXCEPTION
+    WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$
+BEGIN
+    CREATE TYPE rail_service_type_enum AS ENUM ('normal', 'express');
+EXCEPTION
+    WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$
+BEGIN
+    CREATE TYPE fare_class_enum AS ENUM ('standard', 'first');
+EXCEPTION
+    WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$
+BEGIN
+    CREATE TYPE rail_ticket_type_enum AS ENUM ('single', 'return');
+EXCEPTION
+    WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$
+BEGIN
+    CREATE TYPE metro_ticket_type_enum AS ENUM ('single', 'day_pass');
+EXCEPTION
+    WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$
+BEGIN
+    CREATE TYPE booking_status_enum AS ENUM ('confirmed', 'completed', 'cancelled');
+EXCEPTION
+    WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$
+BEGIN
+    CREATE TYPE metro_trip_status_enum AS ENUM ('completed', 'cancelled');
+EXCEPTION
+    WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$
+BEGIN
+    CREATE TYPE payment_method_enum AS ENUM ('credit_card', 'debit_card', 'ewallet');
+EXCEPTION
+    WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$
+BEGIN
+    CREATE TYPE payment_status_enum AS ENUM ('paid', 'refunded', 'failed');
+EXCEPTION
+    WHEN duplicate_object THEN NULL;
+END $$;
+
 CREATE TABLE IF NOT EXISTS registered_users (
     id             BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     user_id        VARCHAR(20) NOT NULL UNIQUE,
@@ -138,9 +201,7 @@ CREATE TABLE IF NOT EXISTS metro_schedule_stops (
 CREATE TABLE IF NOT EXISTS metro_schedule_operating_days (
     metro_schedule_pk BIGINT NOT NULL
         REFERENCES metro_schedules(id),
-    day_of_week       VARCHAR(10) NOT NULL CHECK (
-        day_of_week IN ('mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun')
-    ),
+    day_of_week       day_of_week_enum NOT NULL,
     PRIMARY KEY (metro_schedule_pk, day_of_week)
 );
 
@@ -148,7 +209,7 @@ CREATE TABLE IF NOT EXISTS national_rail_schedules (
     id                     BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     schedule_id            VARCHAR(30) NOT NULL UNIQUE,
     line                   VARCHAR(20) NOT NULL,
-    service_type           VARCHAR(20) NOT NULL CHECK (service_type IN ('normal', 'express')),
+    service_type           rail_service_type_enum NOT NULL,
     direction              VARCHAR(30) NOT NULL,
     origin_station_pk      BIGINT NOT NULL
         REFERENCES national_rail_stations(id),
@@ -173,16 +234,14 @@ CREATE TABLE IF NOT EXISTS national_rail_schedule_stops (
 CREATE TABLE IF NOT EXISTS national_rail_schedule_operating_days (
     national_rail_schedule_pk BIGINT NOT NULL
         REFERENCES national_rail_schedules(id),
-    day_of_week               VARCHAR(10) NOT NULL CHECK (
-        day_of_week IN ('mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun')
-    ),
+    day_of_week               day_of_week_enum NOT NULL,
     PRIMARY KEY (national_rail_schedule_pk, day_of_week)
 );
 
 CREATE TABLE IF NOT EXISTS national_rail_fares (
     national_rail_schedule_pk BIGINT NOT NULL
         REFERENCES national_rail_schedules(id),
-    fare_class                VARCHAR(20) NOT NULL CHECK (fare_class IN ('standard', 'first')),
+    fare_class                fare_class_enum NOT NULL,
     base_fare_usd             NUMERIC(8, 2) NOT NULL CHECK (base_fare_usd >= 0),
     per_stop_rate_usd         NUMERIC(8, 2) NOT NULL CHECK (per_stop_rate_usd >= 0),
     PRIMARY KEY (national_rail_schedule_pk, fare_class)
@@ -194,7 +253,7 @@ CREATE TABLE IF NOT EXISTS national_rail_seats (
         REFERENCES national_rail_schedules(id),
     seat_id                   VARCHAR(10) NOT NULL,
     coach                     VARCHAR(10) NOT NULL,
-    fare_class                VARCHAR(20) NOT NULL CHECK (fare_class IN ('standard', 'first')),
+    fare_class                fare_class_enum NOT NULL,
     row_number                INTEGER NOT NULL CHECK (row_number > 0),
     seat_column               VARCHAR(10) NOT NULL,
     UNIQUE (national_rail_schedule_pk, seat_id)
@@ -215,11 +274,12 @@ CREATE TABLE IF NOT EXISTS national_rail_bookings (
         REFERENCES national_rail_seats(id),
     travel_date                DATE NOT NULL,
     departure_time             TIME NOT NULL,
-    ticket_type                VARCHAR(20) NOT NULL CHECK (ticket_type IN ('single', 'return')),
-    fare_class                 VARCHAR(20) NOT NULL CHECK (fare_class IN ('standard', 'first')),
+    ticket_type                rail_ticket_type_enum NOT NULL,
+    fare_class                 fare_class_enum NOT NULL,
     stops_travelled            INTEGER NOT NULL CHECK (stops_travelled > 0),
+    fare_usd                   NUMERIC(8, 2) NOT NULL CHECK (fare_usd >= 0),
     amount_usd                 NUMERIC(8, 2) NOT NULL CHECK (amount_usd >= 0),
-    status                     VARCHAR(20) NOT NULL CHECK (status IN ('confirmed', 'completed', 'cancelled')),
+    status                     booking_status_enum NOT NULL,
     booked_at                  TIMESTAMPTZ NOT NULL,
     travelled_at               TIMESTAMPTZ
 );
@@ -236,11 +296,12 @@ CREATE TABLE IF NOT EXISTS metro_trips (
     destination_station_pk BIGINT NOT NULL
         REFERENCES metro_stations(id),
     travel_date            DATE NOT NULL,
-    ticket_type            VARCHAR(20) NOT NULL CHECK (ticket_type IN ('single', 'day_pass')),
+    ticket_type            metro_ticket_type_enum NOT NULL,
     day_pass_ref           VARCHAR(30),
     stops_travelled        INTEGER CHECK (stops_travelled IS NULL OR stops_travelled > 0),
+    fare_usd               NUMERIC(8, 2) NOT NULL CHECK (fare_usd >= 0),
     amount_usd             NUMERIC(8, 2) NOT NULL CHECK (amount_usd >= 0),
-    status                 VARCHAR(20) NOT NULL CHECK (status IN ('completed', 'cancelled')),
+    status                 metro_trip_status_enum NOT NULL,
     purchased_at           TIMESTAMPTZ,
     travelled_at           TIMESTAMPTZ
 );
@@ -255,8 +316,8 @@ CREATE TABLE IF NOT EXISTS payments (
     amount_usd               NUMERIC(8, 2) NOT NULL CHECK (amount_usd >= 0),
     refunded_amount_usd      NUMERIC(8, 2) NOT NULL DEFAULT 0 CHECK (refunded_amount_usd >= 0),
     refunded_at              TIMESTAMPTZ,
-    method                   VARCHAR(30) NOT NULL CHECK (method IN ('credit_card', 'debit_card', 'ewallet')),
-    status                   VARCHAR(20) NOT NULL CHECK (status IN ('paid', 'refunded', 'failed')),
+    method                   payment_method_enum NOT NULL,
+    status                   payment_status_enum NOT NULL,
     paid_at                  TIMESTAMPTZ NOT NULL,
     CHECK (
         (national_rail_booking_pk IS NOT NULL AND metro_trip_pk IS NULL)

@@ -478,6 +478,7 @@ def query_user_bookings(user_email: str) -> dict:
             seat.coach,
             seat.seat_id,
             booking.stops_travelled,
+            booking.fare_usd,
             booking.amount_usd,
             booking.status,
             booking.booked_at,
@@ -508,6 +509,7 @@ def query_user_bookings(user_email: str) -> dict:
             trip.ticket_type,
             trip.day_pass_ref,
             trip.stops_travelled,
+            trip.fare_usd,
             trip.amount_usd,
             trip.status,
             trip.purchased_at,
@@ -724,11 +726,12 @@ def execute_booking(
                     ticket_type,
                     fare_class,
                     stops_travelled,
+                    fare_usd,
                     amount_usd,
                     status,
                     booked_at
                 )
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'confirmed', NOW())
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'confirmed', NOW())
                 RETURNING id, booking_id, booked_at
                 """,
                 (
@@ -743,6 +746,7 @@ def execute_booking(
                     ticket_type,
                     fare_class,
                     route["stops_travelled"],
+                    fare["total_fare_usd"],
                     fare["total_fare_usd"],
                 ),
             )
@@ -778,6 +782,7 @@ def execute_booking(
                 "seat_id": seat["seat_id"],
                 "coach": seat["coach"],
                 "stops_travelled": route["stops_travelled"],
+                "fare_usd": fare["total_fare_usd"],
                 "amount_usd": fare["total_fare_usd"],
                 "status": "confirmed",
                 "booked_at": booking["booked_at"],
@@ -818,6 +823,7 @@ def execute_cancellation(booking_id: str, user_id: str) -> tuple[bool, dict | st
                 SELECT
                     booking.id AS booking_pk,
                     booking.booking_id,
+                    booking.fare_usd,
                     booking.amount_usd,
                     booking.status,
                     booking.travel_date,
@@ -851,7 +857,7 @@ def execute_cancellation(booking_id: str, user_id: str) -> tuple[bool, dict | st
                 tzinfo=timezone.utc,
             )
             hours_before = (scheduled_at - datetime.now(timezone.utc)).total_seconds() / 3600
-            amount = booking["amount_usd"]
+            amount = booking["fare_usd"]
             if not isinstance(amount, Decimal):
                 amount = Decimal(str(amount))
 
