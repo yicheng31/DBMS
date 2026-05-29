@@ -2,7 +2,7 @@
 # @Author: Your name
 # @Date:   2026-05-28 14:29:40
 # @Last Modified by:   Your name
-# @Last Modified time: 2026-05-29 15:09:31
+# @Last Modified time: 2026-05-30 01:09:02
 """
 TransitFlow - Intelligent Agent
 
@@ -206,7 +206,9 @@ TOOLS = [
         "name": "check_national_rail_availability",
         "description": (
             "Check available national rail trains and services between two stations. "
-            "Use for schedules, timetables, or availability."
+            "Use for schedules, timetables, availability, or ticket/seat questions "
+            "when the user gives origin/destination stations and a travel date. "
+            "Use this before fare or seat tools if no exact NR_SCH schedule_id is given."
         ),
         "parameters": {
             "origin_id": {"type": "string", "description": "National rail station ID e.g. NR01"},
@@ -228,8 +230,9 @@ TOOLS = [
     {
         "name": "get_national_rail_schedule_fares",
         "description": (
-            "Get all ticket prices for a national rail schedule id when the user asks "
-            "for the price of a service such as NR_SCH04."
+            "Get all ticket prices for a specific national rail schedule id such as NR_SCH04. "
+            "Only use when the user explicitly provides a schedule_id, or after availability "
+            "has identified the schedule. Do not guess a schedule_id from origin/destination."
         ),
         "parameters": {
             "schedule_id": {"type": "string", "description": "e.g. NR_SCH04"},
@@ -288,7 +291,11 @@ TOOLS = [
     },
     {
         "name": "get_available_seats",
-        "description": "Show available seats on a national rail service.",
+        "description": (
+            "Show available seats on a specific national rail service. "
+            "Only use when the user explicitly provides schedule_id, travel_date, and fare_class, "
+            "or after availability has identified the schedule. Do not guess schedule_id."
+        ),
         "parameters": {
             "schedule_id": {"type": "string", "description": "e.g. NR_SCH01"},
             "travel_date": {"type": "string", "description": "YYYY-MM-DD"},
@@ -335,7 +342,11 @@ TOOLS = [
     },
     {
         "name": "find_route",
-        "description": "Find the best route or path between two stations.",
+        "description": (
+            "Find the best physical route or path between two stations. "
+            "Do not use for national rail booking, seat, fare, schedule, or timetable questions "
+            "that include a travel date; use check_national_rail_availability instead."
+        ),
         "parameters": {
             "origin_id": {"type": "string", "description": "Station ID e.g. MS01 or NR01"},
             "destination_id": {"type": "string", "description": "Station ID e.g. MS09 or NR05"},
@@ -346,7 +357,11 @@ TOOLS = [
     },
     {
         "name": "find_alternative_routes",
-        "description": "Find routes that avoid a specific delayed or closed station.",
+        "description": (
+            "Find routes between origin and destination that avoid a delayed or closed station. "
+            "origin_id and destination_id are the passenger journey endpoints; avoid_station_id "
+            "is the disrupted station to avoid, not the destination."
+        ),
         "parameters": {
             "origin_id": {"type": "string", "description": "e.g. NR01"},
             "destination_id": {"type": "string", "description": "e.g. NR05"},
@@ -357,7 +372,12 @@ TOOLS = [
     },
     {
         "name": "get_delay_ripple",
-        "description": "Show affected stations and lines from a disruption.",
+        "description": (
+            "Show affected stations and lines radiating from one delayed or disrupted station. "
+            "Use for delay ripple, impact, affected nearby stations, affected lines, or N-hop "
+            "disruption questions. Do not use find_alternative_routes unless the user gives both "
+            "an origin and destination and asks for a replacement route."
+        ),
         "parameters": {
             "station_id": {"type": "string", "description": "Station ID e.g. NR03 or MS07"},
             "hops": {"type": "integer", "description": "Number of hops"},
@@ -670,6 +690,89 @@ def _parse_tool_calls(llm_response: str) -> list[dict] | None:
     return None
 
 
+def _extract_travel_date(text: str) -> str | None:
+    """Extract ISO or Chinese-formatted dates and return YYYY-MM-DD."""
+    # Native regex catches demo prompts that already use database-friendly dates.
+    iso_match = re.search(r"\b\d{4}-\d{2}-\d{2}\b", text)
+    if iso_match:
+        return iso_match.group(0)
+
+    # Demo users often type dates in Chinese, e.g. "2026 年 6 月 15 日".
+    zh_match = re.search(r"(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日", text)
+    if zh_match:
+        year, month, day = zh_match.groups()
+        return f"{year}-{int(month):02d}-{int(day):02d}"
+
+    # Accept slash dates as another common manual input format.
+    slash_match = re.search(r"\b(\d{4})/(\d{1,2})/(\d{1,2})\b", text)
+    if slash_match:
+        year, month, day = slash_match.groups()
+        return f"{year}-{int(month):02d}-{int(day):02d}"
+
+    return None
+
+
+def _extract_tool_params(call: dict) -> dict:
+    """Return tool params, unwrapping Ollama's nested parameters format if needed."""
+    params = call.get("params") or call.get("parameters") or {}
+    # Some native tool routers return {"parameters": {...}} inside params.
+    if isinstance(params, dict) and isinstance(params.get("parameters"), dict):
+        return params["parameters"]
+    return params if isinstance(params, dict) else {}
+
+
+def _infer_alternative_route_params(text: str, explicit_station_ids: list[str]) -> dict | None:
+    """Infer alternative-route endpoints and avoid station from explicit IDs."""
+    # Keep the user's typed ID order so origin/destination stay aligned with
+    # phrases like "from NR01 to NR05" after removing the disrupted station.
+    ids: list[str] = []
+    for sid in explicit_station_ids:
+        sid = sid.upper()
+        if sid not in ids:
+            ids.append(sid)
+    if len(ids) < 3:
+        return None
+
+    lowered = text.lower()
+    # The station near a closure/disruption keyword is treated as avoid_station_id.
+    # This prevents interchange names like "Old Town" from being mistaken as the trip origin.
+    avoid_keywords = (
+        "avoid",
+        "closed",
+        "closure",
+        "delayed",
+        "delay",
+        "disruption",
+        "disrupted",
+        "關閉",
+        "避開",
+        "延誤",
+        "故障",
+        "停駛",
+    )
+    avoid_id = None
+    for match in re.finditer(r"\b(MS\d{2}|NR\d{2})\b", text, re.IGNORECASE):
+        sid = match.group(1).upper()
+        # Look around each explicit station ID for words that mark disruption intent.
+        window = lowered[max(0, match.start() - 40): match.end() + 40]
+        if any(keyword in window for keyword in avoid_keywords):
+            avoid_id = sid
+            break
+
+    if not avoid_id:
+        return None
+
+    # The remaining explicit IDs are the journey endpoints.
+    endpoints = [sid for sid in ids if sid != avoid_id]
+    if len(endpoints) < 2:
+        return None
+    return {
+        "origin_id": endpoints[0],
+        "destination_id": endpoints[1],
+        "avoid_station_id": avoid_id,
+    }
+
+
 def _cosine_similarity(left: list[float], right: list[float]) -> float:
     """Return cosine similarity for two embedding vectors."""
     if not left or not right or len(left) != len(right):
@@ -764,6 +867,45 @@ def _user_confirmed(history: list[dict]) -> bool:
 
     return _vector_confirmation_state(last_user) == "confirm"
 
+def _extract_pending_booking_from_history(history: list[dict]) -> Optional[dict]:
+    """
+    Recover pending booking details from recent conversation history after user confirms.
+    This is used when the user replies only "confirm", "確認", "好", etc.
+    """
+    text = "\n".join(
+        str(m.get("content", ""))
+        for m in history[-8:]
+    )
+
+    schedule_match = re.search(r"\bNR_SCH\d{2}\b", text, re.IGNORECASE)
+    date_match = re.search(r"\b\d{4}-\d{2}-\d{2}\b", text)
+    station_ids = []
+    for sid in re.findall(r"\bNR\d{2}\b", text, re.IGNORECASE):
+        sid = sid.upper()
+        if sid not in station_ids:
+            station_ids.append(sid)
+
+    if not schedule_match or not date_match or len(station_ids) < 2:
+        return None
+
+    fare_class = "first" if re.search(r"\bfirst\b|first class", text, re.IGNORECASE) else "standard"
+    seat_match = re.search(r"\bseat\s*([A-Z]\d{1,2})\b", text, re.IGNORECASE)
+    if not seat_match:
+        seat_match = re.search(r"\b座位\s*([A-Z]\d{1,2})\b", text, re.IGNORECASE)
+
+    seat_id = seat_match.group(1).upper() if seat_match else "any"
+
+    ticket_type = "return" if re.search(r"\breturn\b|來回", text, re.IGNORECASE) else "single"
+
+    return {
+        "schedule_id": schedule_match.group(0).upper(),
+        "origin_station_id": station_ids[0],
+        "destination_station_id": station_ids[1],
+        "travel_date": date_match.group(0),
+        "fare_class": fare_class,
+        "seat_id": seat_id,
+        "ticket_type": ticket_type,
+    }
 
 def run_agent(
     user_message: str,
@@ -808,7 +950,11 @@ USER: {current_user_email or "not logged in"}
 get_user_bookings: call when logged-in user asks about their bookings, tickets, or travel history.
 get_user_profile: call when logged-in user asks about their account or profile.
 get_payment_info: call with booking_id when user asks about payment for a specific booking.
+National rail route/date ticket, seat, service, or timetable questions: use check_national_rail_availability first.
+Only use get_available_seats or get_national_rail_schedule_fares when the user gives an explicit NR_SCH schedule_id.
 make_booking/cancel_booking: only if user is logged in AND has explicitly confirmed.
+Delay ripple/affected stations/affected lines/impact from one station: use get_delay_ripple.
+Alternative route only when the user gives origin, destination, and an avoid/closed station.
 Route/path/journey/怎麼去/如何前往/路線 questions: use find_route.
 Policy/rules/退款/補償/行李/寵物 questions: use search_policy.
 Never use "" as a param value. Omit optional params if unknown.
@@ -837,8 +983,13 @@ JSON:"""
                     "My account/profile/我的帳號 -> get_user_profile. "
                     "Payment info for booking -> get_payment_info. "
                     "Fare/price/cost for a rail schedule id like NR_SCH04 -> get_national_rail_schedule_fares. "
+                    "National rail origin+destination+date with ticket/seat/service/timetable -> check_national_rail_availability. "
+                    "Do not guess NR_SCH schedule IDs from route/date questions. "
+                    "Use get_available_seats only when the user explicitly provides schedule_id, travel_date, and fare_class. "
                     "Book a ticket -> check availability first, then make_booking only after confirmation. "
                     "Cancel a booking -> cancel_booking. "
+                    "Delay ripple/affected stations/affected lines/impact from one station -> get_delay_ripple. "
+                    "Alternative route requires origin, destination, and avoid station -> find_alternative_routes. "
                     "Policy/rules/refund/luggage/bicycle/退款/補償/行李/寵物 -> search_policy. "
                     "Route/directions/fastest/how-to-get/怎麼去/路線 -> find_route. "
                     "Metro fare/price/cost/票價/多少錢 -> get_metro_fare. "
@@ -864,7 +1015,11 @@ JSON:"""
 
     # Pre-compute common IDs and keywords for deterministic fallback routing.
     lower = augmented_message.lower()
-    raw_station_ids = re.findall(r"\b(MS\d{2}|NR\d{2})\b", augmented_message, re.IGNORECASE)
+    explicit_station_ids = re.findall(r"\b(MS\d{2}|NR\d{2})\b", user_message, re.IGNORECASE)
+    injected_station_ids = re.findall(r"\b(MS\d{2}|NR\d{2})\b", augmented_message, re.IGNORECASE)
+    # Prefer IDs explicitly typed by the user; injected IDs can be nested when
+    # station names overlap, e.g. "Ferndale" inside "Ferndale Halt".
+    raw_station_ids = explicit_station_ids if len(explicit_station_ids) >= 2 else injected_station_ids
     station_ids = []
     for sid in raw_station_ids:
         sid = sid.upper()
@@ -878,7 +1033,7 @@ JSON:"""
         call = next((c for c in tool_calls if c.get("name") == name), None)
         if not call:
             return False
-        params = call.get("params") or {}
+        params = _extract_tool_params(call)
         return all(params.get(k) for k in required_params)
 
     def _fallback(name: str, params: dict, reason: str) -> None:
@@ -939,56 +1094,184 @@ JSON:"""
         "reservation",
         "buy a ticket",
         "ticket",
+        "seat",
+        "seats",
+        "available seat",
+        "available seats",
+        "window",
+        "window seat",
+        "座位",
+        "靠窗",
         "訂票",
         "訂一張票",
         "買票",
         "預訂",
     }
-    travel_date_match = re.search(r"\b\d{4}-\d{2}-\d{2}\b", augmented_message)
-    # For unconfirmed rail booking requests, gather availability, prices, and seats first.
+    travel_date = _extract_travel_date(augmented_message)
+    # Pre-check catches booking/seat questions before a write action is allowed.
+    # It only needs route + date; schedule-specific fare/seat checks wait until
+    # the user or availability result identifies a concrete NR_SCHxx service.
     is_booking_precheck = (
         any(kw in lower for kw in booking_precheck_triggers)
         and not _user_confirmed(history + [{"role": "user", "content": user_message}])
         and len(station_ids) >= 2
-        and schedule_ids
-        and travel_date_match
-        and schedule_ids[0].upper().startswith("NR_SCH")
+        and travel_date
+        and station_ids[0].upper().startswith("NR")
+        and station_ids[1].upper().startswith("NR")
     )
-    if is_booking_precheck:
-        # Build a multi-tool pre-check so the user can confirm with complete details.
-        schedule_id = schedule_ids[0].upper()
+
+    schedule_detail_tools = {
+        "get_national_rail_fare",
+        "get_national_rail_schedule_fares",
+        "get_available_seats",
+    }
+    has_nr_route_and_date = (
+        len(station_ids) >= 2
+        and travel_date
+        and station_ids[0].upper().startswith("NR")
+        and station_ids[1].upper().startswith("NR")
+    )
+    if tool_calls:
+        # Validate router output before execution. This keeps fallback rare:
+        # bad guessed params are skipped or repaired, while valid tool choices pass through.
+        validated_tool_calls = []
+        for call in tool_calls:
+            tool_name = call.get("name", "")
+            params = _extract_tool_params(call)
+            call["params"] = params
+            schedule_id = str(params.get("schedule_id", "")).upper()
+            schedule_was_explicit = schedule_id and schedule_id in {
+                sid.upper() for sid in schedule_ids
+            }
+
+            if has_nr_route_and_date and tool_name in schedule_detail_tools and not schedule_was_explicit:
+                if debug:
+                    debug_info.append(
+                        f"**Tool validation:** skipped `{tool_name}` because route/date query needs availability before guessed schedule params: {params}"
+                    )
+                continue
+
+            if has_nr_route_and_date and is_booking_precheck and tool_name == "find_route":
+                if debug:
+                    debug_info.append(
+                        f"**Tool validation:** skipped `find_route` because rail booking/date prompts need availability first: {params}"
+                    )
+                continue
+
+            if tool_name == "get_national_rail_fare" and schedule_was_explicit:
+                asks_multiple_fare_classes = (
+                    "standard" in lower
+                    and ("first" in lower or "first class" in lower)
+                )
+                missing_stop_count = not params.get("stops_travelled")
+                if asks_multiple_fare_classes or missing_stop_count:
+                    # A schedule-wide fare question should return every fare class.
+                    # get_national_rail_fare is for one exact fare class plus stop count.
+                    call["name"] = "get_national_rail_schedule_fares"
+                    call["params"] = {"schedule_id": schedule_id}
+                    if debug:
+                        debug_info.append(
+                            f"**Tool validation:** repaired fare lookup to schedule-wide fares for {schedule_id}"
+                        )
+
+            if tool_name == "find_alternative_routes":
+                inferred_params = _infer_alternative_route_params(user_message, explicit_station_ids)
+                if inferred_params and any(
+                    str(params.get(key, "")).upper() != value
+                    for key, value in inferred_params.items()
+                ):
+                    params.update(inferred_params)
+                    call["params"] = params
+                    if debug:
+                        debug_info.append(
+                            f"**Tool validation:** repaired `find_alternative_routes` params from explicit avoid-route context: {params}"
+                        )
+
+            if tool_name == "get_delay_ripple" and station_ids:
+                # Delay ripple is about one current station, so prefer the station
+                # explicitly present in this message over IDs from chat history.
+                expected_station_id = station_ids[0].upper()
+                selected_station_id = str(params.get("station_id", "")).upper()
+                if selected_station_id and selected_station_id != expected_station_id:
+                    params["station_id"] = expected_station_id
+                    call["params"] = params
+                    if debug:
+                        debug_info.append(
+                            f"**Tool validation:** repaired `get_delay_ripple` station_id from {selected_station_id} to {expected_station_id}"
+                        )
+
+            if tool_name == "find_route" and len(explicit_station_ids) >= 2:
+                origin_id = str(params.get("origin_id", "")).upper()
+                destination_id = str(params.get("destination_id", "")).upper()
+                expected_origin = station_ids[0].upper()
+                expected_destination = station_ids[1].upper()
+                if (
+                    origin_id
+                    and destination_id
+                    and (origin_id, destination_id) != (expected_origin, expected_destination)
+                ):
+                    if debug:
+                        debug_info.append(
+                            f"**Tool validation:** skipped `find_route` because params do not match explicit station IDs: {params}"
+                        )
+                    continue
+
+            validated_tool_calls.append(call)
+        tool_calls = validated_tool_calls
+
+    if is_booking_precheck and not tool_calls:
+        # Always validate the requested rail direction first, because the LLM may
+        # guess an unrelated schedule ID from earlier examples.
         origin_id = station_ids[0].upper()
         destination_id = station_ids[1].upper()
-        travel_date = travel_date_match.group(0)
         fare_class = "first" if "first" in lower else "standard"
-        _fallback_many(
-            [
-                {
-                    "name": "check_national_rail_availability",
-                    "params": {
-                        "origin_id": origin_id,
-                        "destination_id": destination_id,
-                        "travel_date": travel_date,
+        calls = [
+            {
+                "name": "check_national_rail_availability",
+                "params": {
+                    "origin_id": origin_id,
+                    "destination_id": destination_id,
+                    "travel_date": travel_date,
+                },
+            },
+        ]
+        if schedule_ids and schedule_ids[0].upper().startswith("NR_SCH"):
+            # If the user names a schedule, add exact fare and seat queries too.
+            schedule_id = schedule_ids[0].upper()
+            calls.extend(
+                [
+                    {
+                        "name": "get_national_rail_schedule_fares",
+                        "params": {"schedule_id": schedule_id},
                     },
-                },
-                {
-                    "name": "get_national_rail_schedule_fares",
-                    "params": {"schedule_id": schedule_id},
-                },
-                {
-                    "name": "get_available_seats",
-                    "params": {
-                        "schedule_id": schedule_id,
-                        "travel_date": travel_date,
-                        "fare_class": fare_class,
+                    {
+                        "name": "get_available_seats",
+                        "params": {
+                            "schedule_id": schedule_id,
+                            "travel_date": travel_date,
+                            "fare_class": fare_class,
+                        },
                     },
-                },
-            ],
-            "booking pre-check needs route/date availability, fare, and seats",
-        )
+                ]
+            )
+        _fallback_many(calls, "booking pre-check needs route/date availability before fare and seats")
+        
+    if (
+        current_user_email
+        and not tool_calls
+        and _user_confirmed(history + [{"role": "user", "content": user_message}])
+    ):
+        pending_booking = _extract_pending_booking_from_history(history)
+        if pending_booking:
+            _fallback(
+                "make_booking",
+                pending_booking,
+                "confirmed pending booking",
+            )
 
     if (
-        schedule_ids
+        not tool_calls
+        and schedule_ids
         and any(kw in lower for kw in fare_triggers)
         and not _tool_selected("get_national_rail_schedule_fares", "schedule_id")
         and not is_booking_precheck
@@ -1012,7 +1295,8 @@ JSON:"""
         for call in tool_calls:
             if call.get("name") != "find_route":
                 continue
-            params = call.setdefault("params", {})
+            params = _extract_tool_params(call)
+            call["params"] = params
             origin_id = str(params.get("origin_id", "")).upper()
             destination_id = str(params.get("destination_id", "")).upper()
             if origin_id == destination_id and station_ids[0] == origin_id:
@@ -1022,7 +1306,20 @@ JSON:"""
                         f"**Route repair:** destination changed from {destination_id} to {station_ids[1]}"
                     )
 
-    if is_route and two_stations and not _tool_selected("find_route", "origin_id", "destination_id"):
+    has_route_tool = _tool_selected("find_route", "origin_id", "destination_id")
+    has_alternative_route_tool = _tool_selected(
+        "find_alternative_routes",
+        "origin_id",
+        "destination_id",
+        "avoid_station_id",
+    )
+    if (
+        not tool_calls
+        and is_route
+        and two_stations
+        and not has_route_tool
+        and not has_alternative_route_tool
+    ):
         # Route fallback catches common "how do I get from A to B" phrasing.
         optimise_by = "cost" if any(
             kw in lower for kw in ["cheap", "cheapest", "lowest cost", "最便宜", "最低票價"]
@@ -1139,10 +1436,25 @@ JSON:"""
                 debug_info.append("**Booking gate:** make_booking blocked; no confirmation detected.")
 
     tool_results = []
+    seen_tool_calls: set[str] = set()
     for call in tool_calls:
         # Execute each selected tool and keep both raw JSON and LLM-facing summary.
         tool_name = call.get("name", "")
-        params = call.get("params") or call.get("parameters", {})
+        # Normalise params once here so every downstream check sees the same shape.
+        params = _extract_tool_params(call)
+        call["params"] = params
+
+        # Skip duplicate calls produced by noisy tool routers.
+        call_key = json.dumps(
+            {"name": tool_name, "params": params},
+            sort_keys=True,
+            default=str,
+        )
+        if call_key in seen_tool_calls:
+            if debug:
+                debug_info.append(f"**Skipped** `{tool_name}` - duplicate params: {params}")
+            continue
+        seen_tool_calls.add(call_key)
 
         # Empty-string parameters usually mean the router guessed, so skip them safely.
         if any(v == "" for v in params.values()):
