@@ -864,7 +864,12 @@ JSON:"""
 
     # Pre-compute common IDs and keywords for deterministic fallback routing.
     lower = augmented_message.lower()
-    station_ids = re.findall(r"\b(MS\d{2}|NR\d{2})\b", augmented_message, re.IGNORECASE)
+    raw_station_ids = re.findall(r"\b(MS\d{2}|NR\d{2})\b", augmented_message, re.IGNORECASE)
+    station_ids = []
+    for sid in raw_station_ids:
+        sid = sid.upper()
+        if sid not in station_ids:
+            station_ids.append(sid)
     schedule_ids = re.findall(r"\b(NR_SCH\d{2}|MS_SCH\d{2})\b", augmented_message, re.IGNORECASE)
     two_stations = len(station_ids) >= 2
 
@@ -1002,6 +1007,21 @@ JSON:"""
         or (two_stations and "route" in lower)
         or (two_stations and "路線" in lower)
     )
+    if is_route and two_stations:
+        # Repair router mistakes caused by duplicated station IDs after name injection.
+        for call in tool_calls:
+            if call.get("name") != "find_route":
+                continue
+            params = call.setdefault("params", {})
+            origin_id = str(params.get("origin_id", "")).upper()
+            destination_id = str(params.get("destination_id", "")).upper()
+            if origin_id == destination_id and station_ids[0] == origin_id:
+                params["destination_id"] = station_ids[1]
+                if debug:
+                    debug_info.append(
+                        f"**Route repair:** destination changed from {destination_id} to {station_ids[1]}"
+                    )
+
     if is_route and two_stations and not _tool_selected("find_route", "origin_id", "destination_id"):
         # Route fallback catches common "how do I get from A to B" phrasing.
         optimise_by = "cost" if any(
