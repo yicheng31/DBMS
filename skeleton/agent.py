@@ -1,3 +1,4 @@
+
 # TASK 6 EXTENSION: added get_user_profile and get_payment_info tools,
 # Chinese keyword support, booking confirmation gate, human-friendly prompts,
 # stronger fallback logic, greeting protection, Chinese policy query translation,
@@ -5,15 +6,13 @@
 # booking confirmation context recovery, cancel vs policy classification fix,
 # pre-login check, ticket type extraction, seat preference detection
 """
-TransitFlow — Intelligent Agent
-================================
-This is the brain of the system.
-
-OPTIMIZATIONS (v4):
+TransitFlow — Intelligent Agent (v4 final)
+============================================
+OPTIMIZATIONS:
   1.  Chinese keyword & station name support (30 mappings)
   2.  Added get_user_profile and get_payment_info tools
   3.  Human-friendly system prompt and error messages
-  4.  Booking confirmation mechanism with context recovery
+  4.  Booking confirmation with context recovery from history
   5.  Structured, emoji-enhanced response formatting
   6.  Stronger fallback: overrides wrong tool selections
   7.  Greeting protection: skip tool calls for simple greetings
@@ -27,6 +26,10 @@ OPTIMIZATIONS (v4):
   15. Seat preference extraction (window/aisle)
   16. Multi-schedule selection: list options for user to choose
   17. Stronger confirmation message format in SYSTEM_PROMPT
+  18. Station ID deduplication (BUG FIX #1)
+  19. Booking context recovery uses correct search order (BUG FIX #2)
+  20. Fare class extracted from USER messages only (BUG FIX #3)
+  21. Continuation dialog detection from history (BUG FIX #4)
 """
 
 from __future__ import annotations
@@ -90,26 +93,16 @@ _STATION_INDEX: dict[str, str] = {
 }
 
 _POLICY_TRANSLATION: dict[str, str] = {
-    "退款": "refund cancellation policy",
-    "退票": "refund cancellation policy",
-    "取消": "cancellation refund policy",
-    "補償": "delay compensation policy",
-    "延誤": "delay compensation policy",
-    "誤點": "delay compensation policy",
-    "行李": "luggage baggage policy",
-    "寵物": "pet animal travel policy",
-    "腳踏車": "bicycle bike travel policy",
-    "自行車": "bicycle bike travel policy",
-    "兒童": "child fare discount policy",
-    "小孩": "child fare discount policy",
-    "票種": "ticket types single return day pass",
-    "票價": "fare pricing ticket cost",
-    "規定": "rules policy regulations",
-    "政策": "company policy rules",
-    "食物": "food drink policy onboard",
-    "飲料": "food drink policy onboard",
-    "逃票": "fare evasion penalty",
-    "罰款": "fare evasion penalty",
+    "退款": "refund cancellation policy", "退票": "refund cancellation policy",
+    "取消": "cancellation refund policy", "補償": "delay compensation policy",
+    "延誤": "delay compensation policy", "誤點": "delay compensation policy",
+    "行李": "luggage baggage policy", "寵物": "pet animal travel policy",
+    "腳踏車": "bicycle bike travel policy", "自行車": "bicycle bike travel policy",
+    "兒童": "child fare discount policy", "小孩": "child fare discount policy",
+    "票種": "ticket types single return day pass", "票價": "fare pricing ticket cost",
+    "規定": "rules policy regulations", "政策": "company policy rules",
+    "食物": "food drink policy onboard", "飲料": "food drink policy onboard",
+    "逃票": "fare evasion penalty", "罰款": "fare evasion penalty",
     "訂票規則": "booking rules policy",
 }
 
@@ -141,7 +134,6 @@ _GREETING_PATTERNS = {
     "howdy", "greetings", "yo", "sup",
 }
 
-# Confirmation words — both traditional and simplified Chinese
 _CONFIRM_WORDS = [
     "confirm", "yes", "ok", "sure", "go ahead", "do it",
     "確認", "确认", "好", "好的", "沒問題", "没问题",
@@ -163,15 +155,16 @@ def _is_greeting(text: str) -> bool:
 
 def _is_confirmation(text: str) -> bool:
     """
-    Check if the message is a booking confirmation.
-    Uses the RAW user message (not augmented) to avoid encoding issues.
-    Checks both exact match and substring match for short messages.
+    Check if message is a booking confirmation.
+    Uses RAW user message to avoid encoding issues.
     """
     clean = text.strip().rstrip("!！。.~,，")
-    # Exact match (case-insensitive for English)
+    # Exact match
     if clean.lower() in [w.lower() for w in _CONFIRM_WORDS]:
         return True
-    # Short message containing a confirm word
+    if clean in _CONFIRM_WORDS:
+        return True
+    # Short message containing confirm word
     if len(clean) < 20:
         for w in _CONFIRM_WORDS:
             if w in clean or w in clean.lower():
@@ -189,8 +182,21 @@ def _extract_date(text: str) -> Optional[str]:
     return None
 
 
+# BUG FIX #1: Deduplicate station IDs while preserving order.
+# Before: "Bridgeport NR06 到 Central Station NR01" after injection became
+# "Bridgeport (NR06) NR06 到 Central Station (NR01) NR01"
+# → [NR06, NR06, NR01, NR01] → station_ids[1] = NR06 (WRONG!)
+# After: [NR06, NR01] → station_ids[1] = NR01 (CORRECT!)
 def _extract_station_ids(text: str) -> list[str]:
-    return [sid.upper() for sid in re.findall(r'(MS\d{2}|NR\d{2})', text, re.IGNORECASE)]
+    """Extract unique station IDs preserving first-occurrence order."""
+    seen = set()
+    result = []
+    for sid in re.findall(r'(MS\d{2}|NR\d{2})', text, re.IGNORECASE):
+        upper = sid.upper()
+        if upper not in seen:
+            seen.add(upper)
+            result.append(upper)
+    return result
 
 
 def _extract_ticket_type(text: str) -> str:
@@ -222,7 +228,7 @@ def _pre_classify_query(text: str, station_ids: list[str], has_date: bool,
                         current_user_email: Optional[str]) -> str:
     lower = text.lower()
     two_stations = len(station_ids) >= 2
-    is_cross_network = two_stations and station_ids[0][:2] != station_ids[1][:2]
+    is_cross = two_stations and station_ids[0][:2] != station_ids[1][:2]
 
     route_kw = {
         "fastest", "quickest", "shortest", "cheapest", "route", "path",
@@ -261,52 +267,30 @@ def _pre_classify_query(text: str, station_ids: list[str], has_date: bool,
         "how much", "what is", "what's", "policy", "refund amount",
     }
 
-    # 1. Cross-network = route
-    if is_cross_network and two_stations:
+    if is_cross and two_stations:
         return "route"
-
-    # 2. Route
     if any(kw in lower for kw in route_kw) and two_stations:
         return "route"
-
-    # 3. Cancel vs Policy (smart)
     if any(kw in lower for kw in cancel_kw):
         if any(kw in lower for kw in policy_override_kw) or any(kw in lower for kw in policy_kw):
             return "policy"
         return "cancel"
-
-    # 4. Booking
     if any(kw in lower for kw in booking_kw) and two_stations:
         return "booking"
-
-    # 5. Fare
     if any(kw in lower for kw in fare_kw) and two_stations:
         return "fare"
-
-    # 6. Availability
     if any(kw in lower for kw in avail_kw) and two_stations:
         return "availability"
-
-    # 7. Two stations default
     if two_stations:
         return "availability"
-
-    # 8. Policy
     if any(kw in lower for kw in policy_kw):
         return "policy"
-
-    # 9. Personal
     if any(kw in lower for kw in personal_kw):
         return "personal"
-
-    # 10. Delay
     if any(kw in lower for kw in delay_kw):
         return "delay"
-
     return "general"
 
-
-# ── Tool filtering ────────────────────────────────────────────────────────────
 
 _CATEGORY_TOOLS: dict[str, list[str]] = {
     "route": ["find_route", "find_alternative_routes"],
@@ -331,38 +315,48 @@ def _filter_tools(tools: list[dict], category: str) -> list[dict]:
 
 
 # ── Booking context recovery ─────────────────────────────────────────────────
+# BUG FIX #2: Removed `reversed` so schedule_id search finds the FIRST
+# (correct) schedule, not a later wrong one.
+# BUG FIX #3: Extract fare_class from USER messages only, not from AI
+# responses (which may contain "first" in descriptions of other options).
 
 def _recover_booking_context(history: list[dict]) -> Optional[dict]:
-    """
-    When user says '確認', scan conversation history to recover
-    booking details (origin, destination, date, schedule_id, etc.).
-    """
+    """Recover booking details from conversation history."""
+    # Collect USER messages only (for preferences like fare_class)
+    user_text = ""
+    for msg in history[-10:]:
+        if msg.get("role") == "user":
+            user_text += " " + msg.get("content", "")
+
+    # Collect ALL messages (for schedule_id, station_ids, dates)
+    # BUG FIX #2: forward order, not reversed
     all_text = ""
-    for msg in reversed(history[-10:]):
+    for msg in history[-10:]:
         all_text += " " + msg.get("content", "")
 
-    # Extract schedule ID (most important — proves a booking was discussed)
+    # Schedule ID is required
     schedule_match = re.search(r'(NR_SCH\d+|MS_SCH\d+)', all_text)
     if not schedule_match:
         return None
-    schedule_id = schedule_match.group(1)
 
-    # Extract station IDs
+    # Station IDs (deduplicated)
     station_ids = _extract_station_ids(all_text)
     if len(station_ids) < 2:
         return None
 
-    # Extract other details
+    # Date from all text
     travel_date = _extract_date(all_text)
-    fare_class = _extract_fare_class(all_text)
-    ticket_type = _extract_ticket_type(all_text)
 
-    # Extract seat ID if user mentioned one (e.g. B05, A01)
-    seat_match = re.search(r'\b([AB]\d{2})\b', all_text)
+    # BUG FIX #3: fare_class from USER messages only
+    fare_class = _extract_fare_class(user_text)
+    ticket_type = _extract_ticket_type(user_text)
+
+    # Seat ID if user mentioned one
+    seat_match = re.search(r'\b([AB]\d{2})\b', user_text)
     seat_id = seat_match.group(1) if seat_match else "any"
 
     return {
-        "schedule_id": schedule_id,
+        "schedule_id": schedule_match.group(1),
         "origin_station_id": station_ids[0],
         "destination_station_id": station_ids[1],
         "travel_date": travel_date or date.today().isoformat(),
@@ -678,10 +672,6 @@ def _normalise_result(tool_name: str, result_json: str) -> str:
     return _flatten_to_text(data)
 
 
-def _summarise_result(tool_name: str, result_json: str) -> str:
-    return result_json
-
-
 def _parse_tool_calls(llm_response: str) -> list[dict] | None:
     text = llm_response.strip()
     if text.startswith("```"):
@@ -705,8 +695,6 @@ def _parse_tool_calls(llm_response: str) -> list[dict] | None:
 def _chain_booking_query(origin_id, destination_id, travel_date, fare_class,
                          seat_preference, current_user_email, debug_info, debug):
     results = []
-
-    # Step 1: Availability
     avail_params = {"origin_id": origin_id, "destination_id": destination_id}
     if travel_date:
         avail_params["travel_date"] = travel_date
@@ -715,32 +703,28 @@ def _chain_booking_query(origin_id, destination_id, travel_date, fare_class,
     avail_json = _execute_tool("check_national_rail_availability", avail_params, current_user_email)
     results.append({"tool": "check_national_rail_availability", "params": avail_params,
                      "result": avail_json, "summary": avail_json})
-
     try:
         avail_data = json.loads(avail_json)
         if isinstance(avail_data, list) and avail_data:
             for sched in avail_data:
-                schedule_id = sched.get("schedule_id")
+                sid = sched.get("schedule_id")
                 stops = sched.get("stops_travelled")
-                if schedule_id and stops:
-                    fare_params = {"schedule_id": schedule_id, "fare_class": fare_class,
-                                   "stops_travelled": stops}
+                if sid and stops:
+                    fp = {"schedule_id": sid, "fare_class": fare_class, "stops_travelled": stops}
                     if debug:
-                        debug_info.append(f"**Chain step 2:** get_national_rail_fare({fare_params})")
-                    fare_json = _execute_tool("get_national_rail_fare", fare_params, current_user_email)
-                    results.append({"tool": "get_national_rail_fare", "params": fare_params,
-                                     "result": fare_json, "summary": fare_json})
-                if schedule_id and travel_date and sched == avail_data[0]:
-                    seat_params = {"schedule_id": schedule_id, "travel_date": travel_date,
-                                   "fare_class": fare_class}
+                        debug_info.append(f"**Chain step 2:** get_national_rail_fare({fp})")
+                    fr = _execute_tool("get_national_rail_fare", fp, current_user_email)
+                    results.append({"tool": "get_national_rail_fare", "params": fp,
+                                     "result": fr, "summary": fr})
+                if sid and travel_date and sched == avail_data[0]:
+                    sp = {"schedule_id": sid, "travel_date": travel_date, "fare_class": fare_class}
                     if debug:
-                        debug_info.append(f"**Chain step 3:** get_available_seats({seat_params})")
-                    seat_json = _execute_tool("get_available_seats", seat_params, current_user_email)
-                    results.append({"tool": "get_available_seats", "params": seat_params,
-                                     "result": seat_json, "summary": seat_json})
+                        debug_info.append(f"**Chain step 3:** get_available_seats({sp})")
+                    sr = _execute_tool("get_available_seats", sp, current_user_email)
+                    results.append({"tool": "get_available_seats", "params": sp,
+                                     "result": sr, "summary": sr})
     except (json.JSONDecodeError, KeyError, IndexError):
         pass
-
     if seat_preference:
         results.append({"tool": "seat_preference", "params": {"preference": seat_preference},
                          "result": json.dumps({"user_seat_preference": seat_preference}),
@@ -755,9 +739,7 @@ def run_agent(user_message: str, history: list[dict], debug: bool = False,
     debug_info = []
 
     # ══════════════════════════════════════════════════════════════════
-    # Step 0a: CONFIRMATION CHECK (runs FIRST, on raw user_message)
-    # This catches "確認", "确认", "ok", "yes" etc. BEFORE any other
-    # processing, using the raw message to avoid encoding issues.
+    # Step 0a: CONFIRMATION CHECK (on RAW user_message, before anything)
     # ══════════════════════════════════════════════════════════════════
     if _is_confirmation(user_message):
         if debug:
@@ -767,44 +749,33 @@ def run_agent(user_message: str, history: list[dict], debug: bool = False,
             if debug:
                 debug_info.append("**Booking blocked:** not logged in")
             answer = "您尚未登入，無法完成訂票。請點右上角的登入按鈕後再試 😊"
-            updated_history = history + [
-                {"role": "user", "content": user_message},
-                {"role": "assistant", "content": answer},
-            ]
-            if debug:
-                return answer, updated_history, "\n\n".join(debug_info)
-            return answer, updated_history
-
-        # Try to recover booking context from history
-        booking_ctx = _recover_booking_context(history)
-        if booking_ctx:
-            if debug:
-                debug_info.append(f"**Recovered booking context:** {booking_ctx}")
-            result_json = _execute_tool("make_booking", booking_ctx, current_user_email)
-            if debug:
-                debug_info.append(f"**make_booking result:** {result_json[:300]}")
-
-            data_block = f"[make_booking]\n{_normalise_result('make_booking', result_json)}"
-            content = (
-                f"DATA FROM TRANSITFLOW DATABASE:\n{data_block}"
-                f"\n\nThe user confirmed a booking. Tell them the result."
-            )
         else:
-            if debug:
-                debug_info.append("**No booking context found** in history")
-            content = (
-                "The user said '確認' but there is no previous booking to confirm. "
-                "Ask them to provide booking details: origin, destination, date, fare class."
-            )
+            booking_ctx = _recover_booking_context(history)
+            if booking_ctx:
+                if debug:
+                    debug_info.append(f"**Recovered booking context:** {booking_ctx}")
+                result_json = _execute_tool("make_booking", booking_ctx, current_user_email)
+                if debug:
+                    debug_info.append(f"**make_booking result:** {result_json[:300]}")
+                data_block = f"[make_booking]\n{_normalise_result('make_booking', result_json)}"
+                content = (f"DATA FROM TRANSITFLOW DATABASE:\n{data_block}"
+                           f"\n\nThe user confirmed a booking. Tell them the result.")
+                ctx_prompt = SYSTEM_PROMPT
+                profile = query_user_profile(current_user_email)
+                if profile:
+                    ctx_prompt += f"\n\n目前登入使用者：{profile['full_name']}"
+                answer = llm.chat(
+                    messages=history + [{"role": "user", "content": content}],
+                    system_prompt=ctx_prompt)
+            else:
+                if debug:
+                    debug_info.append("**No booking context found** in history")
+                answer = llm.chat(
+                    messages=history + [{"role": "user", "content":
+                        "The user said '確認' but no booking details were found. "
+                        "Ask them to provide: origin, destination, date, fare class."}],
+                    system_prompt=SYSTEM_PROMPT)
 
-        contextual_prompt = SYSTEM_PROMPT
-        if current_user_email:
-            profile = query_user_profile(current_user_email)
-            if profile:
-                contextual_prompt += f"\n\n目前登入使用者：{profile['full_name']}"
-
-        final_messages = history + [{"role": "user", "content": content}]
-        answer = llm.chat(messages=final_messages, system_prompt=contextual_prompt)
         updated_history = history + [
             {"role": "user", "content": user_message},
             {"role": "assistant", "content": answer},
@@ -821,8 +792,7 @@ def run_agent(user_message: str, history: list[dict], debug: bool = False,
             debug_info.append("**Greeting detected** — skipping all tool calls.")
         answer = llm.chat(
             messages=history + [{"role": "user", "content": user_message}],
-            system_prompt=SYSTEM_PROMPT,
-        )
+            system_prompt=SYSTEM_PROMPT)
         updated_history = history + [
             {"role": "user", "content": user_message},
             {"role": "assistant", "content": answer},
@@ -847,6 +817,27 @@ def run_agent(user_message: str, history: list[dict], debug: bool = False,
     # ══════════════════════════════════════════════════════════════════
     category = _pre_classify_query(_augmented, _station_ids, _travel_date is not None,
                                    current_user_email)
+
+    # ── BUG FIX #4: Continuation dialog detection ────────────────────
+    # If category is "general" but message has booking keywords without
+    # station IDs, check conversation history for station context.
+    if category == "general":
+        _booking_cont_kw = {
+            "訂", "book", "ticket", "買", "購買", "第一班", "第二班",
+            "幫我訂", "我要訂", "standard", "first class",
+        }
+        if any(kw in user_message.lower() for kw in _booking_cont_kw):
+            hist_text = " ".join(m.get("content", "") for m in history[-6:])
+            hist_stations = _extract_station_ids(hist_text)
+            if len(hist_stations) >= 2:
+                category = "booking"
+                _station_ids = hist_stations[:2]
+                _travel_date = _travel_date or _extract_date(hist_text)
+                if debug:
+                    debug_info.append(
+                        f"**Continuation detected:** booking from history, "
+                        f"stations={_station_ids}, date={_travel_date}")
+
     if debug:
         debug_info.append(f"**Pre-classification:** {category}")
 
@@ -858,8 +849,7 @@ def run_agent(user_message: str, history: list[dict], debug: bool = False,
         user_display = f"{profile['full_name']} ({current_user_email})" if profile else current_user_email
         contextual_prompt = SYSTEM_PROMPT + f"\n\n目前登入使用者：{user_display}。"
     else:
-        contextual_prompt = SYSTEM_PROMPT + (
-            "\n\n目前沒有使用者登入。訂票和取消需要先登入。")
+        contextual_prompt = SYSTEM_PROMPT + "\n\n目前沒有使用者登入。訂票和取消需要先登入。"
 
     # ══════════════════════════════════════════════════════════════════
     # Step 4: Execute based on category
@@ -867,15 +857,14 @@ def run_agent(user_message: str, history: list[dict], debug: bool = False,
     tool_results = []
 
     if category == "booking" and len(_station_ids) >= 2:
-        if not current_user_email:
-            if debug:
-                debug_info.append("**Pre-login check:** not logged in")
+        if not current_user_email and debug:
+            debug_info.append("**Pre-login check:** not logged in")
         tool_results = _chain_booking_query(
             _station_ids[0], _station_ids[1], _travel_date, _fare_class,
             _seat_pref, current_user_email, debug_info, debug)
         if not current_user_email:
             tool_results.append({"tool": "login_reminder", "params": {},
-                "result": json.dumps({"reminder": "需要登入才能訂票，請點右上角登入按鈕"}),
+                "result": json.dumps({"reminder": "需要登入才能訂票"}),
                 "summary": json.dumps({"reminder": "需要登入"})})
         if _ticket_type != "single":
             tool_results.append({"tool": "ticket_type_info", "params": {},
@@ -924,7 +913,8 @@ def run_agent(user_message: str, history: list[dict], debug: bool = False,
         else:
             params = {"origin_id": o, "destination_id": d}
             r = _execute_tool("get_metro_fare", params, current_user_email)
-            tool_results.append({"tool": "get_metro_fare", "params": params, "result": r, "summary": r})
+            tool_results.append({"tool": "get_metro_fare", "params": params,
+                                  "result": r, "summary": r})
 
     elif category == "policy":
         params = {"query": user_message}
@@ -960,12 +950,13 @@ def run_agent(user_message: str, history: list[dict], debug: bool = False,
             if debug:
                 debug_info.append(f"**Direct call:** cancel_booking({params})")
             r = _execute_tool("cancel_booking", params, current_user_email)
-            tool_results.append({"tool": "cancel_booking", "params": params, "result": r, "summary": r})
+            tool_results.append({"tool": "cancel_booking", "params": params,
+                                  "result": r, "summary": r})
         else:
             filtered = _filter_tools(TOOLS, category)
             if llm.get_chat_provider() == "ollama":
                 tc = llm.ollama_tool_call(history[-4:] if len(history) > 4 else history,
-                    filtered, _augmented, system_prompt="Extract booking ID and call cancel_booking.")
+                    filtered, _augmented, system_prompt="Extract booking ID, call cancel_booking.")
             else:
                 tc = []
             if debug:
@@ -982,7 +973,8 @@ def run_agent(user_message: str, history: list[dict], debug: bool = False,
             if debug:
                 debug_info.append(f"**Direct call:** get_delay_ripple({params})")
             r = _execute_tool("get_delay_ripple", params, current_user_email)
-            tool_results.append({"tool": "get_delay_ripple", "params": params, "result": r, "summary": r})
+            tool_results.append({"tool": "get_delay_ripple", "params": params,
+                                  "result": r, "summary": r})
 
     # ══════════════════════════════════════════════════════════════════
     # Step 5: Compose final answer
@@ -1002,22 +994,21 @@ def run_agent(user_message: str, history: list[dict], debug: bool = False,
             f"\n\nUser asks: {user_message}"
             f"\n\nAnswer using only the data above. Use emojis and clear formatting."
             f"\nIf booking query: show ALL schedules, ask which one user wants, "
-            f"and include schedule_id/station IDs/date in your confirmation message."
-        )
+            f"include schedule_id/station IDs/date in confirmation message.")
     elif any(kw in user_message.lower() for kw in _DB_KW):
         content = (f"User asks: {user_message}\n\n"
                    "No data retrieved. Do NOT invent data. Apologise and suggest alternatives.")
     else:
         content = user_message
 
-    final_messages = history + [{"role": "user", "content": content}]
-    answer = llm.chat(messages=final_messages, system_prompt=contextual_prompt)
+    answer = llm.chat(
+        messages=history + [{"role": "user", "content": content}],
+        system_prompt=contextual_prompt)
 
     updated_history = history + [
         {"role": "user", "content": user_message},
         {"role": "assistant", "content": answer},
     ]
-
     if debug:
         return answer, updated_history, "\n\n".join(debug_info)
     return answer, updated_history
